@@ -15,7 +15,8 @@
     "error_se": 2.3894656336338413,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.01911250001285225
+    "elapsed_s": 0.009193699981551617,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-call-100-antithetic",
@@ -33,7 +34,8 @@
     "error_se": 0.299023652785448,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.018427799979690462
+    "elapsed_s": 0.0065864999778568745,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-call-100-cv",
@@ -51,7 +53,12 @@
     "error_se": 1.3377971720039423,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.021636799967382103
+    "elapsed_s": 0.012453600007575005,
+    "diagnostics": {
+      "beta": 0.6727818110984272,
+      "vr_factor": 6.875818935750532,
+      "corr": 0.9244256480246599
+    }
   },
   {
     "case_id": "gbm-euro-call-120-plain",
@@ -69,7 +76,8 @@
     "error_se": -0.4707629933297231,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.017098700045607984
+    "elapsed_s": 0.008438199991360307,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-call-120-antithetic",
@@ -87,7 +95,8 @@
     "error_se": -0.6813007786698952,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.013970700034406036
+    "elapsed_s": 0.0060801999643445015,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-call-120-cv",
@@ -105,7 +114,12 @@
     "error_se": -3.0275980532503937,
     "in_ci99": false,
     "passed": true,
-    "elapsed_s": 0.02328609995311126
+    "elapsed_s": 0.012173599970992655,
+    "diagnostics": {
+      "beta": 0.3184097122757075,
+      "vr_factor": 2.27480771265906,
+      "corr": 0.7486002970958645
+    }
   },
   {
     "case_id": "gbm-euro-put-100-plain",
@@ -123,7 +137,8 @@
     "error_se": 1.5742420980350218,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.01583230000687763
+    "elapsed_s": 0.008502600016072392,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-put-100-antithetic",
@@ -141,7 +156,8 @@
     "error_se": -0.3402588000386805,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.014685400004964322
+    "elapsed_s": 0.007891599962022156,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-euro-put-100-cv",
@@ -159,7 +175,12 @@
     "error_se": 0.6141178508179564,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.021812599967233837
+    "elapsed_s": 0.012229799991473556,
+    "diagnostics": {
+      "beta": -0.3262936402981353,
+      "vr_factor": 2.384899552708043,
+      "corr": -0.7620335482804512
+    }
   },
   {
     "case_id": "gbm-digital-call-plain",
@@ -177,7 +198,8 @@
     "error_se": 1.0465661349234705,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.016159499995410442
+    "elapsed_s": 0.00945269997464493,
+    "diagnostics": {}
   },
   {
     "case_id": "gbm-digital-call-cv",
@@ -195,6 +217,308 @@
     "error_se": 1.07141873254647,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.02272170002106577
+    "elapsed_s": 0.012816399976145476,
+    "diagnostics": {
+      "beta": 0.018046536911828434,
+      "vr_factor": 2.4616314577909177,
+      "corr": 0.7705617090373097
+    }
+  },
+  {
+    "case_id": "gbm-asian-geo-call-12-plain",
+    "model": "GBM",
+    "product": "Asian geome. call K=100 T=1 m=12",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 5.911470213180591,
+    "std_error": 0.026023435899798938,
+    "ci_low": 5.860465216062998,
+    "ci_high": 5.962475210298184,
+    "reference": 5.94020022163352,
+    "reference_method": "Kemna-Vorst",
+    "error_se": -1.1040051960683395,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.11471130000427365,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-asian-geo-call-12-antithetic",
+    "model": "GBM",
+    "product": "Asian geome. call K=100 T=1 m=12",
+    "method": "mc-antithetic",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 5.913543860530086,
+    "std_error": 0.018073062173076145,
+    "ci_low": 5.878121309580504,
+    "ci_high": 5.9489664114796685,
+    "reference": 5.94020022163352,
+    "reference_method": "Kemna-Vorst",
+    "error_se": -1.4749222266907747,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.07664319995092228,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-asian-arith-call-12-plain",
+    "model": "GBM",
+    "product": "Asian arith. call K=100 T=1 m=12",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 6.144555689795821,
+    "std_error": 0.026864213314227437,
+    "ci_low": 6.091902799226934,
+    "ci_high": 6.197208580364708,
+    "reference": 6.156038636301545,
+    "reference_method": "Recursive convolution",
+    "error_se": -0.4274439891989327,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.0755627000471577,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-asian-arith-call-12-antithetic",
+    "model": "GBM",
+    "product": "Asian arith. call K=100 T=1 m=12",
+    "method": "mc-antithetic",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 6.149153062580967,
+    "std_error": 0.018625432757648868,
+    "ci_low": 6.112647885179503,
+    "ci_high": 6.185658239982431,
+    "reference": 6.156038636301545,
+    "reference_method": "Recursive convolution",
+    "error_se": -0.3696866435358664,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.06658509996486828,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-asian-arith-call-12-cv",
+    "model": "GBM",
+    "product": "Asian arith. call K=100 T=1 m=12",
+    "method": "mc-cv",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 6.1563275996393285,
+    "std_error": 0.0007625468271315491,
+    "ci_low": 6.154833035321626,
+    "ci_high": 6.157822163957031,
+    "reference": 6.156038636301545,
+    "reference_method": "Recursive convolution",
+    "error_se": 0.37894503983466954,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.11534020002000034,
+    "diagnostics": {
+      "beta": 1.0315871600525905,
+      "vr_factor": 1253.6394805340778,
+      "corr": 0.9996010816847745
+    }
+  },
+  {
+    "case_id": "gbm-asian-arith-put-12-cv",
+    "model": "GBM",
+    "product": "Asian arith. put K=100 T=1 m=12",
+    "method": "mc-cv",
+    "n_paths": 100000,
+    "n_steps": 12,
+    "price": 3.534494625881498,
+    "std_error": 0.00044266623008048297,
+    "ci_low": 3.5336270160133685,
+    "ci_high": 3.535362235749628,
+    "reference": 3.5344782403212327,
+    "reference_method": "Recursive convolution",
+    "error_se": 0.03701560939611133,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.11961380002321675,
+    "diagnostics": {
+      "beta": 0.9761705898163916,
+      "vr_factor": 1565.5984357434177,
+      "corr": 0.9996805822899629
+    }
+  },
+  {
+    "case_id": "gbm-asian-arith-call-52-cv",
+    "model": "GBM",
+    "product": "Asian arith. call K=100 T=1 m=52",
+    "method": "mc-cv",
+    "n_paths": 100000,
+    "n_steps": 52,
+    "price": 5.854360889190363,
+    "std_error": 0.0007003285104797269,
+    "ci_low": 5.852988270532476,
+    "ci_high": 5.8557335078482495,
+    "reference": 5.853862163156998,
+    "reference_method": "Recursive convolution",
+    "error_se": 0.7121315581221829,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.46834950003540143,
+    "diagnostics": {
+      "beta": 1.0342617704924242,
+      "vr_factor": 1326.5061637238325,
+      "corr": 0.9996229989111864
+    }
+  },
+  {
+    "case_id": "gbm-barrier-down-and-out-call-bridge",
+    "model": "GBM",
+    "product": "down-and-out call K=100 H=90 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 8.6470954634182,
+    "std_error": 0.0455230417133571,
+    "ci_low": 8.557871941193305,
+    "ci_high": 8.736318985643095,
+    "reference": 8.665471658245666,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": -0.4036679917650202,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5767166999867186,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-down-and-out-put-bridge",
+    "model": "GBM",
+    "product": "down-and-out put K=100 H=90 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 0.1547389165304342,
+    "std_error": 0.002454058642229019,
+    "ci_low": 0.14992904997571604,
+    "ci_high": 0.15954878308515236,
+    "reference": 0.15122037643987163,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": 1.4337636558540776,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5616923000197858,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-down-and-in-call-bridge",
+    "model": "GBM",
+    "product": "down-and-in call K=100 H=90 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 1.7820152099772468,
+    "std_error": 0.017388504400761975,
+    "ci_low": 1.7479343676067371,
+    "ci_high": 1.8160960523477565,
+    "reference": 1.7851119139398985,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": -0.17808914966349923,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5666472999728285,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-down-and-in-put-bridge",
+    "model": "GBM",
+    "product": "down-and-in put K=100 H=90 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 5.3827359661546454,
+    "std_error": 0.02742347582958937,
+    "ci_low": 5.328986941197746,
+    "ci_high": 5.436484991111545,
+    "reference": 5.422305645817099,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": -1.4429126310735105,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5511693999869749,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-up-and-out-call-bridge",
+    "model": "GBM",
+    "product": "up-and-out call K=100 H=120 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 1.1798218938186649,
+    "std_error": 0.009455002363950745,
+    "ci_low": 1.1612904297115803,
+    "ci_high": 1.1983533579257495,
+    "reference": 1.1760653996503576,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": 0.3973022981601473,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.6045400999719277,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-up-and-out-put-bridge",
+    "model": "GBM",
+    "product": "up-and-out put K=100 H=120 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 5.377198896318087,
+    "std_error": 0.027306943254556994,
+    "ci_low": 5.323678271011277,
+    "ci_high": 5.430719521624898,
+    "reference": 5.360127871647822,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": 0.6251532627115496,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5717564999940805,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-up-and-in-call-bridge",
+    "model": "GBM",
+    "product": "up-and-in call K=100 H=120 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 9.240946507284965,
+    "std_error": 0.047650380165672364,
+    "ci_low": 9.147553478310606,
+    "ci_high": 9.334339536259325,
+    "reference": 9.274518172535206,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": -0.7045413936576764,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5633365999674425,
+    "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-barrier-up-and-in-put-bridge",
+    "model": "GBM",
+    "product": "up-and-in put K=100 H=120 T=1",
+    "method": "mc-plain",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 0.21503698685279388,
+    "std_error": 0.004604376710333265,
+    "ci_low": 0.20601257432928566,
+    "ci_high": 0.2240613993763021,
+    "reference": 0.2133981506091489,
+    "reference_method": "Reiner-Rubinstein",
+    "error_se": 0.3559300958079842,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 0.5748182999668643,
+    "diagnostics": {}
   }
 ]
