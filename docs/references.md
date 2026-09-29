@@ -1,0 +1,34 @@
+# References
+
+- Albrecher, H., Mayer, P., Schoutens, W., & Tistaert, J. (2007). The little Heston trap. *Wilmott Magazine*, January, 83-92.
+- Andersen, L. (2008). Simple and efficient simulation of the Heston stochastic volatility model. *Journal of Computational Finance*, 11(3), 1-42.
+- Benhamou, E. (2002). Fast Fourier transform for discrete Asian options. *Journal of Computational Finance*, 6(1), 49-68.
+- Bertsimas, D., Kogan, L., & Lo, A. W. (2000). When is time continuous? *Journal of Financial Economics*, 55(2), 173-204.
+- Black, F., & Scholes, M. (1973). The pricing of options and corporate liabilities. *Journal of Political Economy*, 81(3), 637-654.
+- Boyle, P. P., & Emanuel, D. (1980). Discretely adjusted option hedges. *Journal of Financial Economics*, 8(3), 259-282.
+- Branch, M. A., Coleman, T. F., & Li, Y. (1999). A subspace, interior, and conjugate gradient method for large-scale bound-constrained minimization problems. *SIAM Journal on Scientific Computing*, 21(1), 1-23.
+- Brent, R. P. (1973). *Algorithms for Minimization without Derivatives*. Prentice-Hall.
+- Broadie, M., & Detemple, J. (1996). American option valuation: new bounds, approximations, and a comparison of existing methods. *Review of Financial Studies*, 9(4), 1211-1250.
+- Broadie, M., & Glasserman, P. (1996). Estimating security price derivatives using simulation. *Management Science*, 42(2), 269-285.
+- Broadie, M., Glasserman, P., & Kou, S. (1997). A continuity correction for discrete barrier options. *Mathematical Finance*, 7(4), 325-349.
+- Carr, P., & Madan, D. (1999). Option valuation using the fast Fourier transform. *Journal of Computational Finance*, 2(4), 61-73.
+- Carverhill, A., & Clewlow, L. (1990). Flexible convolution. *Risk*, 3(4), 25-29.
+- Chan, T. F., Golub, G. H., & LeVeque, R. J. (1979). Updating formulae and a pairwise algorithm for computing sample variances. Stanford report STAN-CS-79-773.
+- Clément, E., Lamberton, D., & Protter, P. (2002). An analysis of a least squares regression method for American option pricing. *Finance and Stochastics*, 6(4), 449-471.
+- Cox, J. C., Ross, S. A., & Rubinstein, M. (1979). Option pricing: a simplified approach. *Journal of Financial Economics*, 7(3), 229-263.
+- Gatheral, J. (2006). *The Volatility Surface: A Practitioner's Guide*. Wiley.
+- Gil-Pelaez, J. (1951). Note on the inversion theorem. *Biometrika*, 38(3-4), 481-482.
+- Glasserman, P. (2003). *Monte Carlo Methods in Financial Engineering*. Springer.
+- Haug, E. G. (2007). *The Complete Guide to Option Pricing Formulas* (2nd ed.). McGraw-Hill.
+- Heston, S. L. (1993). A closed-form solution for options with stochastic volatility with applications to bond and currency options. *Review of Financial Studies*, 6(2), 327-343.
+- Kemna, A. G. Z., & Vorst, A. C. F. (1990). A pricing method for options based on average asset values. *Journal of Banking & Finance*, 14(1), 113-129.
+- L'Ecuyer, P., & Lemieux, C. (2002). Recent advances in randomized quasi-Monte Carlo methods. In *Modeling Uncertainty*, Springer, 419-474.
+- Leland, H. E. (1985). Option pricing and replication with transactions costs. *Journal of Finance*, 40(5), 1283-1301.
+- Longstaff, F. A., & Schwartz, E. S. (2001). Valuing American options by simulation: a simple least-squares approach. *Review of Financial Studies*, 14(1), 113-147.
+- Lord, R., Koekkoek, R., & van Dijk, D. (2010). A comparison of biased simulation schemes for stochastic volatility models. *Quantitative Finance*, 10(2), 177-194.
+- Manaster, S., & Koehler, G. (1982). The calculation of implied variances from the Black-Scholes model: a note. *Journal of Finance*, 37(1), 227-230.
+- Merton, R. C. (1976). Option pricing when underlying stock returns are discontinuous. *Journal of Financial Economics*, 3(1-2), 125-144.
+- Moskowitz, B., & Caflisch, R. E. (1996). Smoothness and dimension reduction in quasi-Monte Carlo methods. *Mathematical and Computer Modelling*, 23(8-9), 37-54.
+- Owen, A. B. (1997). Scrambled net variance for integrals of smooth functions. *Annals of Statistics*, 25(4), 1541-1562.
+- Reiner, E., & Rubinstein, M. (1991). Breaking down the barriers. *Risk*, 4(8), 28-35.
+- Sobol', I. M. (1967). On the distribution of points in a cube and the approximate evaluation of integrals. *USSR Computational Mathematics and Mathematical Physics*, 7(4), 86-112.

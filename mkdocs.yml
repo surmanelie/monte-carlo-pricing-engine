@@ -1,0 +1,98 @@
+site_name: mcengine — Monte Carlo pricing engine
+site_description: Monte Carlo derivatives pricing and hedging engine in Python, with every result validated against an independent reference.
+site_author: Elie Surman
+site_url: https://surmanelie.github.io/monte-carlo-pricing-engine/
+repo_url: https://github.com/surmanelie/monte-carlo-pricing-engine
+repo_name: surmanelie/monte-carlo-pricing-engine
+copyright: Copyright &copy; 2026 Elie Surman — MIT License
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+hooks:
+  - docs/hooks.py
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_symbol_type_heading: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            merge_init_into_class: true
+            extensions:
+              - docs/griffe_rest_math.py:RestMath
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Theory:
+      - Monte Carlo estimators: theory/monte-carlo.md
+      - Models: theory/models.md
+      - Path-dependent products: theory/path-dependent.md
+      - American options: theory/american.md
+      - Fourier pricing & implied volatility: theory/fourier.md
+      - Greeks: theory/greeks.md
+      - Delta hedging: theory/hedging.md
+      - Calibration: theory/calibration.md
+  - Results: results.md
+  - Dashboard: dashboard.md
+  - API reference:
+      - Results & statistics: api/core.md
+      - Random numbers: api/random.md
+      - Models: api/models.md
+      - Products: api/products.md
+      - Engines: api/engines.md
+      - Greeks & hedging: api/greeks-hedging.md
+      - Volatility & calibration: api/volatility-calibration.md
+      - Reporting & CLI: api/reporting.md
+  - References: references.md
+  - Changelog: changelog.md
