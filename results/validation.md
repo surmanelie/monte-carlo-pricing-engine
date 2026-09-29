@@ -50,5 +50,18 @@
 | Merton | European call K=120 T=1 | `mc-plain` | 100,000 | 1 | 5.0374 | [4.9624, 5.1125] | 5.0906 | Merton series | -1.39 | yes | ✅ |
 | Merton | European call K=100 T=1 | `mc-cv` | 100,000 | 1 | 12.7585 | [12.7113, 12.8057] | 12.7613 | Merton series | -0.12 | yes | ✅ |
 | Merton | European put K=100 T=1 | `mc-antithetic` | 100,000 | 1 | 7.9331 | [7.8736, 7.9925] | 7.8842 | Merton series | +1.61 | yes | ✅ |
+| GBM | European call K=100 T=1: delta | `mc-bump` | 100,000 | 1 | 0.6369 | [0.6334, 0.6405] | 0.6368 | Black-Scholes delta | +0.05 | yes | ✅ |
+| GBM | European call K=100 T=1: delta | `mc-pathwise` | 100,000 | 1 | 0.6363 | [0.6327, 0.6398] | 0.6368 | Black-Scholes delta | -0.32 | yes | ✅ |
+| GBM | European call K=100 T=1: delta | `mc-lr` | 100,000 | 1 | 0.6434 | [0.6342, 0.6525] | 0.6368 | Black-Scholes delta | +1.40 | yes | ✅ |
+| GBM | European call K=100 T=1: gamma | `mc-bump` | 100,000 | 1 | 0.0190 | [0.0183, 0.0196] | 0.0188 | Black-Scholes gamma | +0.61 | yes | ✅ |
+| GBM | European call K=100 T=1: gamma | `mc-pathwise` | 100,000 | 1 | 0.0187 | [0.0185, 0.0189] | 0.0188 | Black-Scholes gamma | -0.57 | yes | ✅ |
+| GBM | European call K=100 T=1: gamma | `mc-lr` | 100,000 | 1 | 0.0189 | [0.0180, 0.0197] | 0.0188 | Black-Scholes gamma | +0.21 | yes | ✅ |
+| GBM | European call K=100 T=1: vega | `mc-bump` | 100,000 | 1 | 37.4369 | [36.9689, 37.9049] | 37.5240 | Black-Scholes vega | -0.36 | yes | ✅ |
+| GBM | European call K=100 T=1: vega | `mc-pathwise` | 100,000 | 1 | 37.7906 | [37.3173, 38.2639] | 37.5240 | Black-Scholes vega | +1.10 | yes | ✅ |
+| GBM | European call K=100 T=1: vega | `mc-lr` | 100,000 | 1 | 37.8512 | [36.1463, 39.5561] | 37.5240 | Black-Scholes vega | +0.38 | yes | ✅ |
+| GBM | Digital call K=100 T=1: delta | `mc-bump` | 100,000 | 1 | 0.0195 | [0.0189, 0.0201] | 0.0188 | Black-Scholes delta | +2.43 | yes | ✅ |
+| GBM | Digital call K=100 T=1: delta | `mc-lr` | 100,000 | 1 | 0.0187 | [0.0185, 0.0188] | 0.0188 | Black-Scholes delta | -1.14 | yes | ✅ |
+| GBM | Digital call K=100 T=1: gamma | `mc-lr` | 100,000 | 1 | -0.0003 | [-0.0003, -0.0003] | -0.0003 | Black-Scholes gamma | +0.85 | yes | ✅ |
+| GBM | Digital call K=100 T=1: vega | `mc-lr` | 100,000 | 1 | -0.6371 | [-0.6654, -0.6087] | -0.6567 | Black-Scholes vega | +1.36 | yes | ✅ |
 
-50/50 rows pass (|error| < 4 SE); 49/50 references lie inside the 99% confidence interval (about 0.5 misses expected by chance for unbiased estimators).
+63/63 rows pass (|error| < 4 SE); 62/63 references lie inside the 99% confidence interval (about 0.6 misses expected by chance for unbiased estimators).

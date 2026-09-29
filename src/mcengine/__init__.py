@@ -13,7 +13,7 @@ from mcengine.models.gbm import GBM
 from mcengine.products.european import DigitalOption, EuropeanOption
 from mcengine.results import GreeksResult, PricingResult
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "GBM",

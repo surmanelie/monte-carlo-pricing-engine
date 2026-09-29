@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-09-29
+
+### Added
+- Monte Carlo Greeks under GBM (delta, gamma, vega) with standard errors: bump and
+  revalue with common random numbers, pathwise derivatives (mixed pathwise-LR gamma for
+  vanillas) and likelihood-ratio weights; the digital option illustrates why pathwise
+  estimators fail on discontinuous payoffs while the likelihood ratio works.
+- Discrete delta-hedging simulator: short option sold at the Black-Scholes price, N
+  rebalancing dates on common paths, proportional transaction costs, dividends, GBM and
+  Heston (misspecified hedge) dynamics, fitted log-log slope of the hedging-error std.
+- Validation rows for Monte Carlo Greeks against Black-Scholes Greeks.
+- Figures: Greeks estimators vs closed forms, hedging P&L histograms, hedging-error std
+  vs rebalancing frequency.
+
 ## [0.4.0] - 2026-09-29
 
 ### Added
