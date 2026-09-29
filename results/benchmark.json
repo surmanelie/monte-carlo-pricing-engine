@@ -1,0 +1,818 @@
+{
+  "machine": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel",
+    "cpu_count": "12",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "numba": "0.67.0",
+    "mcengine": "0.5.0"
+  },
+  "throughput": [
+    {
+      "model": "GBM (exact)",
+      "engine": "mc-plain",
+      "backend": "numpy",
+      "n_steps": 1,
+      "n_paths": 1000000,
+      "seconds": 0.06512430001748726,
+      "paths_per_second": 15355251.4150859,
+      "path_steps_per_second": 15355251.4150859
+    },
+    {
+      "model": "GBM (exact)",
+      "engine": "mc-plain",
+      "backend": "numpy",
+      "n_steps": 252,
+      "n_paths": 100000,
+      "seconds": 1.0355791000183672,
+      "paths_per_second": 96564.32811190028,
+      "path_steps_per_second": 24334210.68419887
+    },
+    {
+      "model": "Heston QE",
+      "engine": "mc-plain",
+      "backend": "numpy",
+      "n_steps": 252,
+      "n_paths": 100000,
+      "seconds": 2.7076486999867484,
+      "paths_per_second": 36932.41298270688,
+      "path_steps_per_second": 9306968.071642134
+    },
+    {
+      "model": "Heston QE",
+      "engine": "mc-plain",
+      "backend": "numba",
+      "n_steps": 252,
+      "n_paths": 100000,
+      "seconds": 1.6269715999951586,
+      "paths_per_second": 61463.8878762835,
+      "path_steps_per_second": 15488899.744823443
+    },
+    {
+      "model": "Heston Euler FT",
+      "engine": "mc-plain",
+      "backend": "numpy",
+      "n_steps": 252,
+      "n_paths": 100000,
+      "seconds": 2.900745299994014,
+      "paths_per_second": 34473.89882876182,
+      "path_steps_per_second": 8687422.50484798
+    },
+    {
+      "model": "Merton (exact)",
+      "engine": "mc-plain",
+      "backend": "numpy",
+      "n_steps": 252,
+      "n_paths": 100000,
+      "seconds": 3.2092711000004783,
+      "paths_per_second": 31159.723464927938,
+      "path_steps_per_second": 7852250.313161841
+    },
+    {
+      "model": "GBM, American put",
+      "engine": "lsm",
+      "backend": "numpy",
+      "n_steps": 50,
+      "n_paths": 100000,
+      "seconds": 1.3397184999776073,
+      "paths_per_second": 74642.54617792577,
+      "path_steps_per_second": 3732127.3088962887
+    },
+    {
+      "model": "GBM, American put",
+      "engine": "lsm",
+      "backend": "numba",
+      "n_steps": 50,
+      "n_paths": 100000,
+      "seconds": 0.8900600000051782,
+      "paths_per_second": 112351.97627060897,
+      "path_steps_per_second": 5617598.813530449
+    }
+  ],
+  "error_vs_time": [
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 4096,
+      "rmse": 0.06860935198692714,
+      "seconds": 0.0004237750079482794
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 8192,
+      "rmse": 0.050118610496998006,
+      "seconds": 0.0005840700003318488
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 16384,
+      "rmse": 0.02419444111758886,
+      "seconds": 0.0011778350104577839
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 32768,
+      "rmse": 0.02245218041822075,
+      "seconds": 0.0018565849954029546
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 65536,
+      "rmse": 0.018634683488285685,
+      "seconds": 0.0048344200011342766
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 131072,
+      "rmse": 0.008848438264219919,
+      "seconds": 0.01039260000397917
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 262144,
+      "rmse": 0.006097047009485362,
+      "seconds": 0.016133284993702545
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 524288,
+      "rmse": 0.0066708709201216574,
+      "seconds": 0.03654757500335108
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 1048576,
+      "rmse": 0.004717379671975877,
+      "seconds": 0.0737134349939879
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 4096,
+      "rmse": 0.0765961952567649,
+      "seconds": 0.00046657999337185174
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 8192,
+      "rmse": 0.03848067618511926,
+      "seconds": 0.0005617800023173913
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 16384,
+      "rmse": 0.028994673366213686,
+      "seconds": 0.0007434250030200929
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 32768,
+      "rmse": 0.022240308646131413,
+      "seconds": 0.0017506550037069246
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 65536,
+      "rmse": 0.015331462901990988,
+      "seconds": 0.0030404000106500463
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 131072,
+      "rmse": 0.01151129620675867,
+      "seconds": 0.005872544992598705
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 262144,
+      "rmse": 0.006941163398804888,
+      "seconds": 0.011877715002628974
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 524288,
+      "rmse": 0.004834776029375653,
+      "seconds": 0.026068270005634987
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 1048576,
+      "rmse": 0.004210582148880259,
+      "seconds": 0.0474261750059668
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 4096,
+      "rmse": 0.06752411685032517,
+      "seconds": 0.0005311299930326641
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 8192,
+      "rmse": 0.03148639784756448,
+      "seconds": 0.0006965500011574477
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 16384,
+      "rmse": 0.029918260301657753,
+      "seconds": 0.0012151900038588793
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 32768,
+      "rmse": 0.021763406469181006,
+      "seconds": 0.0021256850071949885
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 65536,
+      "rmse": 0.01223669120835154,
+      "seconds": 0.0061190999986138195
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 131072,
+      "rmse": 0.006947720723918923,
+      "seconds": 0.013088515002164059
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 262144,
+      "rmse": 0.0075723523068728016,
+      "seconds": 0.024988414990366435
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 524288,
+      "rmse": 0.003984189924342105,
+      "seconds": 0.048250094999093565
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 1048576,
+      "rmse": 0.003094640352670316,
+      "seconds": 0.1001605350029422
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 4096,
+      "rmse": 0.011913629592063104,
+      "seconds": 0.008787679998204113
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 8192,
+      "rmse": 0.005682375833009485,
+      "seconds": 0.009257655002875254
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 16384,
+      "rmse": 0.002492315428394746,
+      "seconds": 0.009673750001820736
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 32768,
+      "rmse": 0.0010237354447541363,
+      "seconds": 0.011160914995707571
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 65536,
+      "rmse": 0.0007557665973201959,
+      "seconds": 0.012310085000353865
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 131072,
+      "rmse": 0.0002880674013869658,
+      "seconds": 0.015212429995881394
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 262144,
+      "rmse": 0.00016015685754446402,
+      "seconds": 0.02982223000144586
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 524288,
+      "rmse": 5.8022070657819935e-05,
+      "seconds": 0.044900439996854405
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 1048576,
+      "rmse": 5.5662123372517094e-05,
+      "seconds": 0.08033080500317738
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 4096,
+      "rmse": 0.015390154427913295,
+      "seconds": 0.000356555002508685
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 8192,
+      "rmse": 0.00806129198391827,
+      "seconds": 0.0005135700019309297
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 16384,
+      "rmse": 0.005780913774274061,
+      "seconds": 0.0010403650085208938
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 32768,
+      "rmse": 0.00548903343680963,
+      "seconds": 0.0017948799941223115
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 65536,
+      "rmse": 0.003272507752298952,
+      "seconds": 0.00495363499794621
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 131072,
+      "rmse": 0.0027156171942900272,
+      "seconds": 0.010342110006604344
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 262144,
+      "rmse": 0.001987390239119054,
+      "seconds": 0.02329911001143046
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 524288,
+      "rmse": 0.0010544281365217037,
+      "seconds": 0.04294152500515338
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 1048576,
+      "rmse": 0.0009995866377490842,
+      "seconds": 0.12306652999832295
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 4096,
+      "rmse": 0.09110835489740346,
+      "seconds": 0.0027955800003837796
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 8192,
+      "rmse": 0.06723279874354254,
+      "seconds": 0.007135775004280731
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 16384,
+      "rmse": 0.06604753545634016,
+      "seconds": 0.01788973500370048
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 32768,
+      "rmse": 0.04337702588157347,
+      "seconds": 0.024582464998820795
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 65536,
+      "rmse": 0.04214883008748538,
+      "seconds": 0.05035603000433184
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 131072,
+      "rmse": 0.026832633559940127,
+      "seconds": 0.10028997000190429
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 262144,
+      "rmse": 0.01595934447098349,
+      "seconds": 0.19477789000084159
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 524288,
+      "rmse": 0.013891615554149046,
+      "seconds": 0.3180565700051375
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 1048576,
+      "rmse": 0.0076861248415642,
+      "seconds": 0.7420750800083624
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 4096,
+      "rmse": 0.09238401703298023,
+      "seconds": 0.001577320010983385
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 8192,
+      "rmse": 0.06346541160592341,
+      "seconds": 0.002502979995915666
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 16384,
+      "rmse": 0.043931980227252546,
+      "seconds": 0.0065661749977152795
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 32768,
+      "rmse": 0.04138224955000806,
+      "seconds": 0.013269895003759302
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 65536,
+      "rmse": 0.02720041234848677,
+      "seconds": 0.02573622000054456
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 131072,
+      "rmse": 0.01739392867356653,
+      "seconds": 0.04967775999975856
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 262144,
+      "rmse": 0.013642307198261167,
+      "seconds": 0.1334606600110419
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 524288,
+      "rmse": 0.007956746644474148,
+      "seconds": 0.37181999000022187
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 1048576,
+      "rmse": 0.005695563414782984,
+      "seconds": 0.605068280006526
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 4096,
+      "rmse": 0.0028812596678581045,
+      "seconds": 0.002673874996253289
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 8192,
+      "rmse": 0.0026488608749008036,
+      "seconds": 0.005591274998732842
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 16384,
+      "rmse": 0.0020498192623232274,
+      "seconds": 0.010439469991251827
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 32768,
+      "rmse": 0.0015250202403969957,
+      "seconds": 0.02117171999125276
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 65536,
+      "rmse": 0.0009748288433103479,
+      "seconds": 0.06055582499830052
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 131072,
+      "rmse": 0.0007984167520962772,
+      "seconds": 0.11448262499761767
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 262144,
+      "rmse": 0.0005087119822080388,
+      "seconds": 0.2359635899978457
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 524288,
+      "rmse": 0.0003271764618622661,
+      "seconds": 0.45336076999665237
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 1048576,
+      "rmse": 0.00015761781125005268,
+      "seconds": 0.8244771800033049
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 4096,
+      "rmse": 0.008134190918556815,
+      "seconds": 0.014415315006044694
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 8192,
+      "rmse": 0.004177120251239914,
+      "seconds": 0.015763505001086742
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 16384,
+      "rmse": 0.002206921054473982,
+      "seconds": 0.019354094998561777
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 32768,
+      "rmse": 0.0012721627492255838,
+      "seconds": 0.025454194998019375
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 65536,
+      "rmse": 0.0007604012040950544,
+      "seconds": 0.054677460005041215
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 131072,
+      "rmse": 0.0005792792548680326,
+      "seconds": 0.1281725800014101
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 262144,
+      "rmse": 0.0002525027542253697,
+      "seconds": 0.3336788099986734
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 524288,
+      "rmse": 0.00022785460010247993,
+      "seconds": 0.7798127399990336
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 1048576,
+      "rmse": 0.0001454170082628664,
+      "seconds": 1.6271688750042812
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 4096,
+      "rmse": 0.14512163289581773,
+      "seconds": 0.002276050005457364
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 8192,
+      "rmse": 0.09371415236870981,
+      "seconds": 0.004077265009982511
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 16384,
+      "rmse": 0.09479545272259736,
+      "seconds": 0.013162610010476783
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 32768,
+      "rmse": 0.059404049458398625,
+      "seconds": 0.026360554998973384
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 65536,
+      "rmse": 0.04274442232086233,
+      "seconds": 0.05542849499906879
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 131072,
+      "rmse": 0.02780390146442652,
+      "seconds": 0.11436591499659698
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 262144,
+      "rmse": 0.01820272131557833,
+      "seconds": 0.19777071999851614
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 524288,
+      "rmse": 0.011449558220753294,
+      "seconds": 0.430433235008968
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 1048576,
+      "rmse": 0.009723051843699603,
+      "seconds": 0.8072644200088689
+    }
+  ],
+  "efficiency": [
+    {
+      "problem": "European call K=140",
+      "method": "mc-plain",
+      "n_paths": 1048576,
+      "std_error": 0.0041425175672397535,
+      "seconds": 0.07837010000366718,
+      "variance_reduction": 1.0,
+      "efficiency_gain": 1.0
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-antithetic",
+      "n_paths": 1048576,
+      "std_error": 0.004067744461352413,
+      "seconds": 0.04827540001133457,
+      "variance_reduction": 1.0371018114005375,
+      "efficiency_gain": 1.6836271196999157
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-cv",
+      "n_paths": 1048576,
+      "std_error": 0.003536445243676486,
+      "seconds": 0.11790890002157539,
+      "variance_reduction": 1.372128678268419,
+      "efficiency_gain": 0.9120080139337975
+    },
+    {
+      "problem": "European call K=140",
+      "method": "qmc-sobol-bb",
+      "n_paths": 1048576,
+      "std_error": 2.6715941304567723e-05,
+      "seconds": 0.10239680000813678,
+      "variance_reduction": 24042.950170476895,
+      "efficiency_gain": 18401.438415006454
+    },
+    {
+      "problem": "European call K=140",
+      "method": "mc-is",
+      "n_paths": 1048576,
+      "std_error": 0.0008540111489740571,
+      "seconds": 0.08356480003567412,
+      "variance_reduction": 23.528900701622526,
+      "efficiency_gain": 22.066256368414905
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-plain",
+      "n_paths": 1048576,
+      "std_error": 0.008306425541905176,
+      "seconds": 0.4916146000032313,
+      "variance_reduction": 1.0,
+      "efficiency_gain": 1.0
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-antithetic",
+      "n_paths": 1048576,
+      "std_error": 0.005747508619266865,
+      "seconds": 0.44058490003226325,
+      "variance_reduction": 2.0886664483146093,
+      "efficiency_gain": 2.3305812805957813
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-cv",
+      "n_paths": 1048576,
+      "std_error": 0.00023154398747994058,
+      "seconds": 1.1373424000339583,
+      "variance_reduction": 1286.9489996827433,
+      "efficiency_gain": 556.2818353423737
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "qmc-sobol-bb",
+      "n_paths": 1048576,
+      "std_error": 0.00011478886077076101,
+      "seconds": 1.7134729000390507,
+      "variance_reduction": 5236.352340959374,
+      "efficiency_gain": 1502.3682379324807
+    },
+    {
+      "problem": "Arithmetic Asian call K=100, m=12",
+      "method": "mc-is",
+      "n_paths": 1048576,
+      "std_error": 0.009803183356623998,
+      "seconds": 0.9198898999602534,
+      "variance_reduction": 0.7179498375303226,
+      "efficiency_gain": 0.38369224644721606
+    }
+  ]
+}
