@@ -7,3 +7,4 @@
 | GBM | Digital call K=100 T=1 | `mc-plain` | 20,000 | 1000 | 95.7% | 98.9% | -0.012 | 0.987 |
 | GBM | Asian arith. call K=100 T=1 m=12 | `mc-cv` | 20,000 | 1000 | 94.1% | 98.4% | -0.026 | 1.020 |
 | GBM | down-and-out call K=100 H=90 T=1 | `mc-plain` | 20,000 | 1000 | 94.5% | 99.0% | -0.049 | 1.023 |
+| Merton | European call K=100 T=1 | `mc-plain` | 20,000 | 1000 | 95.3% | 98.9% | +0.011 | 1.012 |

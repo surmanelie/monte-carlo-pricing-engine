@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-09-29
+
+### Added
+- Heston model with the Andersen (2008) QE scheme (martingale correction, branch-wise
+  vectorised step) and full-truncation Euler for comparison; "little Heston trap"
+  characteristic function (Albrecher et al. 2007); Feller-ratio diagnostic.
+- Merton jump-diffusion with exact simulation (Poisson counts by inversion, exact
+  conditional jump sums) and the Merton series formula with an explicit truncation
+  tolerance.
+- Fourier pricing: adaptive Gil-Pelaez inversion (reference), vectorised
+  Gauss-Legendre Gil-Pelaez for many strikes, and Carr-Madan FFT with configurable
+  damping.
+- Implied volatility: vectorised Newton with vega, Brent fallback, no-arbitrage bound
+  checks.
+- Validation rows for Heston (QE and Euler) against Gil-Pelaez and for Merton against the
+  series formula.
+- Figures: Heston/Merton implied-volatility smiles with Monte Carlo points, and QE vs
+  Euler discretisation bias vs time step in a Feller-violating case.
+
 ## [0.3.0] - 2026-09-29
 
 ### Added
