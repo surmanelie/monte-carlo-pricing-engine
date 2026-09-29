@@ -107,9 +107,13 @@ class Merton(Model):
         drift = (self.r - self.q - self.lam * self.kbar - 0.5 * self.sigma**2) * dt
         increments = drift + self.sigma * np.sqrt(dt) * z[:, :, 0]
         uniforms = ndtr(z[:, :, 1])
-        for k, step in enumerate(dt):
-            counts = poisson_inverse(uniforms[:, k], self.lam * float(step))
-            increments[:, k] += counts * self.mu_j + self.delta_j * np.sqrt(counts) * z[:, k, 2]
+        counts = np.empty(uniforms.shape, dtype=np.int64)
+        # one inverse-CDF table per distinct step length (a single one on uniform grids)
+        steps, which = np.unique(np.round(dt, 14), return_inverse=True)
+        for j, step in enumerate(steps):
+            cols = which == j
+            counts[:, cols] = poisson_inverse(uniforms[:, cols], self.lam * float(step))
+        increments += counts * self.mu_j + self.delta_j * np.sqrt(counts) * z[:, :, 2]
         log_paths = np.zeros((z.shape[0], t.size))
         np.cumsum(increments, axis=1, out=log_paths[:, 1:])
         return np.asarray(self.s0 * np.exp(log_paths), dtype=np.float64)
