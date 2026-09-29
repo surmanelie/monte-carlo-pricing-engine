@@ -57,6 +57,7 @@ from typing import ClassVar
 import numpy as np
 from scipy.special import ndtr
 
+from mcengine._numba import heston_qe_kernel, require_backend
 from mcengine._typing import ComplexArray, FloatArray
 from mcengine._validation import (
     require_choice,
@@ -96,6 +97,9 @@ class Heston(Model):
         QE switching threshold (Andersen recommends 1.5).
     martingale_correction
         Apply Andersen's :math:`K_0^*` correction in the QE scheme.
+    backend
+        ``"numpy"`` (vectorised over paths) or ``"numba"`` (compiled QE kernel, requires
+        the ``[fast]`` extra; identical results for the same normals).
     """
 
     s0: float
@@ -109,8 +113,10 @@ class Heston(Model):
     scheme: str = "qe"
     psi_c: float = 1.5
     martingale_correction: bool = True
+    backend: str = "numpy"
 
     n_factors: ClassVar[int] = 2
+    price_factor: ClassVar[int] = 1
     exact_simulation: ClassVar[bool] = False
     name: ClassVar[str] = "heston"
 
@@ -125,6 +131,9 @@ class Heston(Model):
         require_in_range("rho", self.rho, -1.0, 1.0)
         require_choice("scheme", self.scheme, SCHEMES)
         require_in_range("psi_c", self.psi_c, 1.0, 2.0)
+        require_backend(self.backend)
+        if self.backend == "numba" and self.scheme != "qe":
+            raise ValueError("the numba backend implements the QE scheme only")
 
     @property
     def feller_ratio(self) -> float:
@@ -136,6 +145,7 @@ class Heston(Model):
         return Heston(
             self.s0, self.r, self.v0, self.kappa, self.theta, self.xi, self.rho, self.q,
             scheme, self.psi_c, self.martingale_correction,
+            self.backend if scheme == "qe" else "numpy",
         )  # fmt: skip
 
     def paths_from_normals(self, times: FloatArray, z: FloatArray) -> FloatArray:
@@ -147,6 +157,13 @@ class Heston(Model):
     ) -> tuple[FloatArray, FloatArray]:
         """Price and variance paths, both of shape ``(n, len(times))``."""
         t = self._check_normals(times, z)
+        if self.backend == "numba":
+            log_s, var = heston_qe_kernel(
+                math.log(self.s0), self.v0, np.diff(t), np.ascontiguousarray(z[:, :, 0]),
+                np.ascontiguousarray(z[:, :, 1]), self.kappa, self.theta, self.xi, self.rho,
+                self.r - self.q, self.psi_c, self.martingale_correction,
+            )  # fmt: skip
+            return np.exp(log_s), var
         n = z.shape[0]
         log_s = np.empty((n, t.size))
         var = np.empty((n, t.size))
