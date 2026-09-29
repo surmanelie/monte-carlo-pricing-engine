@@ -39,6 +39,8 @@ class Model(ABC):
     q: float
     #: Number of independent standard normals consumed per path and time step.
     n_factors: ClassVar[int]
+    #: Index of the factor that drives the price (shifted by importance sampling).
+    price_factor: ClassVar[int] = 0
     #: Whether paths are exact on any grid (no time-discretisation bias).
     exact_simulation: ClassVar[bool]
     #: Short name used in tables and the CLI.
