@@ -27,6 +27,7 @@ from typing import Any
 
 import numpy as np
 
+from mcengine._numba import HAS_NUMBA
 from mcengine.engines.analytic import (
     barrier_price,
     bs_digital_price,
@@ -37,7 +38,7 @@ from mcengine.engines.analytic import (
 from mcengine.engines.convolution import asian_arithmetic_price
 from mcengine.engines.fourier import gil_pelaez_price
 from mcengine.engines.lsm import price_lsm
-from mcengine.engines.monte_carlo import price_mc
+from mcengine.engines.monte_carlo import price_mc, qmc_path_count
 from mcengine.engines.tree import price_tree
 from mcengine.greeks.analytic import bs_greeks, digital_greeks
 from mcengine.greeks.monte_carlo import mc_greeks
@@ -273,10 +274,15 @@ def mc_case(
     tags: tuple[str, ...] = (),
     **mc_kwargs: Any,
 ) -> ValidationCase:
-    """Build a case that runs :func:`price_mc` against a fixed or lazily computed reference."""
+    """Build a case that runs :func:`price_mc` against a fixed or lazily computed reference.
+
+    For ``method="qmc"`` the scaled path count is rounded to a valid ``16 x 2^m``.
+    """
 
     def run(seed: int, scale: float) -> PricingResult:
         n = _paths(n_paths, scale)
+        if method == "qmc":
+            n = qmc_path_count(n)
         return price_mc(model, product, n_paths=n, method=method, seed=seed, **mc_kwargs)
 
     def ref() -> tuple[float, str]:
@@ -506,6 +512,109 @@ def _greek_cases() -> list[ValidationCase]:
     return cases
 
 
+#: Path count of the quasi-Monte Carlo rows: 16 scramblings of 2^13 Sobol points.
+_N_QMC = 16 * 2**13
+
+
+def _qmc_is_cases() -> list[ValidationCase]:
+    m = _BS
+    cases: list[ValidationCase] = []
+    call = EuropeanOption(100.0, 1.0)
+    bs_call = float(bs_price(m.s0, 100.0, 1.0, m.r, m.sigma))
+    cases.append(
+        mc_case("gbm-euro-call-100-qmc", "GBM", m, call, "qmc", _N_QMC, bs_call, "Black-Scholes")
+    )
+    asian = AsianOption(100.0, 1.0, 12)
+    cases.append(
+        mc_case(
+            "gbm-asian-arith-call-12-qmc",
+            "GBM",
+            m,
+            asian,
+            "qmc",
+            _N_QMC,
+            lambda: asian_arithmetic_price(m, asian),
+            "Recursive convolution",
+        )
+    )
+    barrier = BarrierOption(100.0, 1.0, 90.0, "down-and-out", "call", 50, "bridge", m.sigma)
+    ref = barrier_price(m.s0, 100.0, 90.0, 1.0, m.r, m.sigma)
+    cases.append(
+        mc_case(
+            "gbm-barrier-down-and-out-call-bridge-qmc",
+            "GBM",
+            m,
+            barrier,
+            "qmc",
+            _N_QMC,
+            ref,
+            "Reiner-Rubinstein",
+        )
+    )
+    for strike in (140.0, 180.0):
+        product = EuropeanOption(strike, 1.0)
+        ref = float(bs_price(m.s0, strike, 1.0, m.r, m.sigma))
+        cases.append(
+            mc_case(
+                f"gbm-euro-call-{strike:g}-is",
+                "GBM",
+                m,
+                product,
+                "is",
+                _N_EURO,
+                ref,
+                "Black-Scholes",
+            )
+        )
+    digital = DigitalOption(150.0, 1.0)
+    ref = float(bs_digital_price(m.s0, 150.0, 1.0, m.r, m.sigma))
+    cases.append(
+        mc_case("gbm-digital-call-150-is", "GBM", m, digital, "is", _N_EURO, ref, "e^{-rT} N(d2)")
+    )
+    heston_call = EuropeanOption(100.0, 1.0)
+
+    def heston_ref() -> float:
+        return gil_pelaez_price(HESTON, 100.0, 1.0)
+
+    cases.append(
+        mc_case(
+            "heston-qe-call-100-qmc",
+            "Heston QE (Δt = 1/50)",
+            HESTON,
+            heston_call,
+            "qmc",
+            _N_QMC,
+            heston_ref,
+            "Gil-Pelaez (little trap)",
+            n_steps=50,
+        )
+    )
+    if HAS_NUMBA:  # pragma: no branch - depends on the environment
+        fast = Heston(100.0, 0.03, 0.04, 2.0, 0.04, 0.5, -0.7, backend="numba")
+        cases.append(
+            mc_case(
+                "heston-qe-call-100-plain-numba",
+                "Heston QE, Numba (Δt = 1/50)",
+                fast,
+                heston_call,
+                "plain",
+                _N_EURO,
+                heston_ref,
+                "Gil-Pelaez (little trap)",
+                n_steps=50,
+            )
+        )
+    merton_call = EuropeanOption(100.0, 1.0)
+    mm = MERTON
+    ref = merton_price(mm.s0, 100.0, 1.0, mm.r, mm.sigma, mm.lam, mm.mu_j, mm.delta_j)
+    cases.append(
+        mc_case(
+            "merton-call-100-qmc", "Merton", mm, merton_call, "qmc", _N_QMC, ref, "Merton series"
+        )
+    )
+    return cases
+
+
 def all_cases() -> list[ValidationCase]:
     """The full validation registry, in table order."""
     return [
@@ -516,6 +625,7 @@ def all_cases() -> list[ValidationCase]:
         *_heston_cases(),
         *_merton_cases(),
         *_greek_cases(),
+        *_qmc_is_cases(),
     ]
 
 
@@ -531,6 +641,7 @@ COVERAGE_CASE_IDS: tuple[str, ...] = (
     "merton-call-100-plain",
     "gbm-greek-call-gamma-pathwise",
     "gbm-greek-digital-gamma-lr",
+    "gbm-euro-call-140-is",
 )
 
 
