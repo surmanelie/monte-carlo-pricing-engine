@@ -15,11 +15,21 @@ from pathlib import Path
 import numpy as np
 
 from mcengine.engines.analytic import barrier_price, bs_price
+from mcengine.engines.lsm import fit_lsm
 from mcengine.engines.monte_carlo import price_mc, simulate_discounted_payoffs
+from mcengine.engines.tree import crr_exercise_boundary
 from mcengine.models.gbm import GBM
+from mcengine.products.american import AmericanOption
 from mcengine.products.barrier import BarrierOption
 from mcengine.products.european import EuropeanOption
-from mcengine.reporting.style import INK, METHOD_COLORS, PALETTE, new_figure, save_figure
+from mcengine.reporting.style import (
+    INK,
+    INK_SECONDARY,
+    METHOD_COLORS,
+    PALETTE,
+    new_figure,
+    save_figure,
+)
 from mcengine.stats import z_value
 
 FigureFunc = Callable[[Path, bool], dict[str, float]]
@@ -154,10 +164,67 @@ def fig_barrier_monitoring(outdir: Path, quick: bool = False) -> dict[str, float
     return out
 
 
+def fig_exercise_boundary(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """American put early-exercise boundary: Longstaff-Schwartz policy vs CRR tree."""
+    model = GBM(36.0, 0.06, 0.2)
+    product = AmericanOption(40.0, 1.0, "put", 50)
+    n_steps = 500 if quick else 5000
+    n_train = 20_000 if quick else 200_000
+    args = (36.0, 40.0, 1.0, 0.06, 0.2)
+    times, american = crr_exercise_boundary(*args, n_steps=n_steps)
+    dates = product.monitoring_times()
+    _, bermudan_all = crr_exercise_boundary(
+        *args, n_steps=n_steps, style="bermudan", exercise_times=dates
+    )
+    bermudan = bermudan_all[np.rint(dates / 1.0 * n_steps).astype(int)]
+    fig, ax = new_figure()
+    ax.plot(
+        times,
+        american,
+        color=INK_SECONDARY,
+        linewidth=1.0,
+        label=f"CRR tree, American ($N = {n_steps}$)",
+    )
+    ax.plot(
+        dates,
+        bermudan,
+        color=INK,
+        linewidth=1.5,
+        marker="_",
+        markersize=8,
+        label="CRR tree, Bermudan (50 dates)",
+    )
+    out: dict[str, float] = {"n_train": float(n_train)}
+    for offset, degree in enumerate((3, 6)):
+        fit = fit_lsm(model, product, n_paths=n_train, degree=degree, seed=77 + offset)
+        boundary = fit.exercise_boundary(product)
+        ax.plot(
+            dates,
+            boundary,
+            "o",
+            color=PALETTE[offset],
+            markersize=5,
+            label=f"LSM, Laguerre degree {degree} ({n_train:,} paths)",
+        )
+        valid = ~np.isnan(boundary[:-1]) & ~np.isnan(bermudan[:-1])
+        out[f"mean_abs_gap_deg{degree}"] = float(
+            np.mean(np.abs(boundary[:-1][valid] - bermudan[:-1][valid]))
+        )
+    ax.axhline(40.0, color=INK_SECONDARY, linestyle=":", linewidth=1.0, label="Strike $K = 40$")
+    ax.set_xlabel("Time $t$ (years)")
+    ax.set_ylabel("Critical stock price $S^*(t)$")
+    ax.set_title("Early-exercise boundary of the American put ($S_0 = 36$, $\\sigma = 0.2$)")
+    ax.set_ylim(top=42.5)
+    ax.legend(loc="upper left", ncols=2, fontsize=8)
+    save_figure(fig, outdir / "exercise_boundary.png")
+    return out
+
+
 FIGURES: dict[str, FigureFunc] = {
     "convergence": fig_convergence,
     "error_vs_n": fig_error_vs_n,
     "barrier_monitoring": fig_barrier_monitoring,
+    "exercise_boundary": fig_exercise_boundary,
 }
 
 

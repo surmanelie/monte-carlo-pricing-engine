@@ -34,9 +34,12 @@ from mcengine.engines.analytic import (
     geometric_asian_price,
 )
 from mcengine.engines.convolution import asian_arithmetic_price
+from mcengine.engines.lsm import price_lsm
 from mcengine.engines.monte_carlo import price_mc
+from mcengine.engines.tree import price_tree
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.products.american import AmericanOption
 from mcengine.products.asian import AsianOption
 from mcengine.products.barrier import BARRIER_TYPES, BarrierOption
 from mcengine.products.base import Product
@@ -336,9 +339,72 @@ def _barrier_cases() -> list[ValidationCase]:
     return cases
 
 
+def lsm_case(
+    case_id: str,
+    model_label: str,
+    model: GBM,
+    product: AmericanOption,
+    n_paths: int,
+    reference: Callable[[], float],
+    reference_label: str,
+) -> ValidationCase:
+    """Longstaff-Schwartz case (Laguerre degree 3, independent pricing paths)."""
+
+    def run(seed: int, scale: float) -> PricingResult:
+        n = _paths(n_paths, scale)
+        return price_lsm(model, product, n_paths=n, seed=seed)
+
+    return ValidationCase(
+        case_id,
+        model_label,
+        product.label,
+        run,
+        lambda: (float(reference()), reference_label),
+    )
+
+
+def _american_cases() -> list[ValidationCase]:
+    """Longstaff & Schwartz (2001), Table 1 grid, against a Bermudan CRR tree."""
+    cases: list[ValidationCase] = []
+    for s0 in (36.0, 40.0, 44.0):
+        for sigma in (0.2, 0.4):
+            for maturity in (1.0, 2.0):
+                model = GBM(s0, 0.06, sigma)
+                product = AmericanOption(40.0, maturity, "put", round(50 * maturity))
+                n_steps = round(5000 * maturity)
+
+                def reference(
+                    m: GBM = model, p: AmericanOption = product, n: int = n_steps
+                ) -> float:
+                    return price_tree(m, p, n_steps=n).price
+
+                cid = f"gbm-american-put-s{s0:g}-v{sigma:g}-t{maturity:g}-lsm"
+                label = f"GBM S0={s0:g} σ={sigma:g}"
+                ref_label = f"CRR Bermudan tree (N={n_steps}, BBS-Richardson)"
+                cases.append(lsm_case(cid, label, model, product, _N_EURO, reference, ref_label))
+    call_model = GBM(40.0, 0.06, 0.2)
+    call = AmericanOption(40.0, 1.0, "call", 50)
+
+    def call_reference() -> float:
+        return float(bs_price(40.0, 40.0, 1.0, 0.06, 0.2))
+
+    cases.append(
+        lsm_case(
+            "gbm-american-call-no-dividend-lsm",
+            "GBM S0=40 σ=0.2",
+            call_model,
+            call,
+            _N_EURO,
+            call_reference,
+            "Black-Scholes (no early exercise)",
+        )
+    )
+    return cases
+
+
 def all_cases() -> list[ValidationCase]:
     """The full validation registry, in table order."""
-    return [*_european_cases(), *_asian_cases(), *_barrier_cases()]
+    return [*_european_cases(), *_asian_cases(), *_barrier_cases(), *_american_cases()]
 
 
 #: Case identifiers used in the confidence-interval coverage study.
