@@ -39,5 +39,16 @@
 | GBM S0=44 σ=0.4 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 3.9597 | [3.9276, 3.9918] | 3.9477 | CRR Bermudan tree (N=5000, BBS-Richardson) | +0.74 | yes | ✅ |
 | GBM S0=44 σ=0.4 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 5.6122 | [5.5720, 5.6524] | 5.6412 | CRR Bermudan tree (N=10000, BBS-Richardson) | -1.42 | yes | ✅ |
 | GBM S0=40 σ=0.2 | American call K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 4.4212 | [4.3840, 4.4585] | 4.3958 | Black-Scholes (no early exercise) | +1.34 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European call K=90 T=1 | `mc-plain` | 100,000 | 50 | 15.7310 | [15.6489, 15.8132] | 15.7717 | Gil-Pelaez (little trap) | -0.97 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European call K=100 T=1 | `mc-plain` | 100,000 | 50 | 8.9515 | [8.8870, 9.0161] | 8.9294 | Gil-Pelaez (little trap) | +0.67 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European call K=110 T=1 | `mc-plain` | 100,000 | 50 | 3.9796 | [3.9358, 4.0234] | 3.9785 | Gil-Pelaez (little trap) | +0.05 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European call K=100 T=1 | `mc-antithetic` | 100,000 | 50 | 8.9599 | [8.9170, 9.0029] | 8.9294 | Gil-Pelaez (little trap) | +1.39 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European put K=100 T=1 | `mc-cv` | 100,000 | 50 | 5.9467 | [5.9120, 5.9815] | 5.9740 | Gil-Pelaez (little trap) | -1.54 | yes | ✅ |
+| Heston Euler FT (Δt = 1/200) | European call K=100 T=1 | `mc-plain` | 100,000 | 200 | 8.9819 | [8.9174, 9.0465] | 8.9294 | Gil-Pelaez (little trap) | +1.59 | yes | ✅ |
+| Merton | European call K=80 T=1 | `mc-plain` | 100,000 | 1 | 26.0874 | [25.9430, 26.2318] | 25.9555 | Merton series | +1.79 | yes | ✅ |
+| Merton | European call K=100 T=1 | `mc-plain` | 100,000 | 1 | 12.7965 | [12.6826, 12.9105] | 12.7613 | Merton series | +0.61 | yes | ✅ |
+| Merton | European call K=120 T=1 | `mc-plain` | 100,000 | 1 | 5.0374 | [4.9624, 5.1125] | 5.0906 | Merton series | -1.39 | yes | ✅ |
+| Merton | European call K=100 T=1 | `mc-cv` | 100,000 | 1 | 12.7585 | [12.7113, 12.8057] | 12.7613 | Merton series | -0.12 | yes | ✅ |
+| Merton | European put K=100 T=1 | `mc-antithetic` | 100,000 | 1 | 7.9331 | [7.8736, 7.9925] | 7.8842 | Merton series | +1.61 | yes | ✅ |
 
-39/39 rows pass (|error| < 4 SE); 38/39 references lie inside the 99% confidence interval (about 0.4 misses expected by chance for unbiased estimators).
+50/50 rows pass (|error| < 4 SE); 49/50 references lie inside the 99% confidence interval (about 0.5 misses expected by chance for unbiased estimators).
