@@ -1,0 +1,13 @@
+{
+  "convergence": {
+    "final_estimate": 10.437985634404708,
+    "final_half_width": 0.028865564466879403,
+    "n": 1000000.0
+  },
+  "error_vs_n": {
+    "n_seeds": 20.0,
+    "slope_antithetic": -0.5135495167807074,
+    "slope_cv": -0.5114236568994567,
+    "slope_plain": -0.4778452872742716
+  }
+}
