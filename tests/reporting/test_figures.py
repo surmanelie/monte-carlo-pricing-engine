@@ -15,7 +15,9 @@ def test_quick_figures(tmp_path: Path) -> None:
     )
     assert names == list(FIGURES)
     for name in FIGURES:
-        assert (tmp_path / "fig" / f"{name}.png").stat().st_size > 10_000
+        pngs = list((tmp_path / "fig").glob(f"{name}*.png"))
+        assert pngs, name
+        assert all(png.stat().st_size > 10_000 for png in pngs)
     stored = json.loads((tmp_path / "res" / "figures.json").read_text(encoding="utf-8"))
     assert stored == json.loads(json.dumps(numbers))
     # re-running a subset keeps the numbers of the other figures
