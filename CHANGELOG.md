@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.7.0] - 2026-09-29
+
+### Added
+- Heston calibration to an implied-volatility surface: weighted least squares on implied
+  volatilities (vectorised Gil-Pelaez pricing per maturity, vectorised implied-vol
+  inversion), bounded trust-region reflective solver with multiple starts, Feller-ratio
+  diagnostic.
+- Synthetic surfaces generated from known parameters plus Gaussian noise, used to test
+  parameter recovery.
+- Optional loader for a user-provided option-chain CSV (documented schema: maturity,
+  strike, implied_vol or price + option_type, optional weight); nothing is downloaded
+  or scraped.
+- Figure: market vs calibrated implied-volatility smiles and residual heatmap.
+
 ## [0.6.0] - 2026-09-29
 
 ### Added

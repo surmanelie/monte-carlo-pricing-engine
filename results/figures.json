@@ -9,6 +9,24 @@
     "none_m4": 9.04104122613984,
     "none_m512": 6.033297532443322
   },
+  "calibration": {
+    "elapsed_s": 1.9836773999850266,
+    "feller_ratio_fit": 0.42394684117957,
+    "fit_kappa": 1.5214511878344386,
+    "fit_rho": -0.7006640259078009,
+    "fit_theta": 0.04986161222159081,
+    "fit_v0": 0.039949863011000515,
+    "fit_xi": 0.5982345153747294,
+    "max_abs_error_vol": 0.0017336613912311283,
+    "n_quotes": 36.0,
+    "noise_vol": 0.001,
+    "rmse_vol": 0.0008162756274776151,
+    "true_kappa": 1.5,
+    "true_rho": -0.7,
+    "true_theta": 0.05,
+    "true_v0": 0.04,
+    "true_xi": 0.6
+  },
   "convergence": {
     "final_estimate": 10.437985634404708,
     "final_half_width": 0.028865564466879403,
