@@ -39,6 +39,7 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.special import eval_laguerre
 
+from mcengine._numba import lsm_policy_kernel, require_backend
 from mcengine._typing import FloatArray
 from mcengine._validation import require_choice, require_int_at_least
 from mcengine.engines.monte_carlo import auto_chunk_size, chunk_sizes
@@ -207,6 +208,7 @@ def price_lsm(
     seed: int | None = None,
     rng: np.random.Generator | None = None,
     chunk_size: int | None = None,
+    backend: str = "numpy",
 ) -> PricingResult:
     """Low-biased Longstaff-Schwartz price with an independent pricing set.
 
@@ -220,8 +222,11 @@ def price_lsm(
         Regression basis (``"laguerre"`` or ``"monomial"``) and number of non-constant terms.
     steps_per_date
         Simulation steps between exercise dates (1 suffices for exact models such as GBM).
+    backend
+        ``"numpy"`` or ``"numba"`` (compiled pricing-pass kernel, ``[fast]`` extra).
     """
     started = time.perf_counter()
+    require_backend(backend)
     if not isinstance(product, AmericanOption):
         raise ValueError("price_lsm prices AmericanOption products")
     require_int_at_least("n_paths", n_paths, 2)
@@ -241,7 +246,21 @@ def price_lsm(
     acc = StreamingMoments()
     for size in chunk_sizes(n_paths, chunk):
         paths = _simulate(model, times, size, price_rng)
-        acc.update(_apply_policy(model, product, fit, paths, idx))
+        if backend == "numba":
+            spots = np.ascontiguousarray(paths[:, idx])
+            acc.update(
+                lsm_policy_kernel(
+                    spots,
+                    product.exercise_value(spots),
+                    np.exp(-model.r * fit.exercise_times),
+                    fit.coefficients,
+                    fit.fitted,
+                    fit.strike,
+                    fit.basis == "laguerre",
+                )
+            )
+        else:
+            acc.update(_apply_policy(model, product, fit, paths, idx))
     price, se = float(acc.mean[0]), acc.std_error()
     half = z_value(0.95) * se
     return PricingResult(
