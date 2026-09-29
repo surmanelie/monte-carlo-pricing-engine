@@ -1,0 +1,2 @@
+# Dependencies for Streamlit Community Cloud (main file: app/streamlit_app.py).
+monte-carlo-pricing-engine[app] @ git+https://github.com/surmanelie/monte-carlo-pricing-engine.git@v1.0.0
