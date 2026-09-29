@@ -14,11 +14,12 @@ from pathlib import Path
 
 import numpy as np
 
-from mcengine.engines.analytic import bs_price
+from mcengine.engines.analytic import barrier_price, bs_price
 from mcengine.engines.monte_carlo import price_mc, simulate_discounted_payoffs
 from mcengine.models.gbm import GBM
+from mcengine.products.barrier import BarrierOption
 from mcengine.products.european import EuropeanOption
-from mcengine.reporting.style import INK, METHOD_COLORS, new_figure, save_figure
+from mcengine.reporting.style import INK, METHOD_COLORS, PALETTE, new_figure, save_figure
 from mcengine.stats import z_value
 
 FigureFunc = Callable[[Path, bool], dict[str, float]]
@@ -99,9 +100,64 @@ def fig_error_vs_n(outdir: Path, quick: bool = False) -> dict[str, float]:
     return out
 
 
+def fig_barrier_monitoring(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """Down-and-out call vs number of monitoring dates: raw, BGK, Brownian bridge, continuous."""
+    n_paths = 20_000 if quick else 200_000
+    dates = [4, 16] if quick else [4, 8, 16, 32, 64, 128, 256, 512]
+    k, h, sigma = 100.0, 95.0, _BS.sigma
+    continuous = barrier_price(_BS.s0, k, h, 1.0, _BS.r, sigma)
+    fig, ax = new_figure()
+    out: dict[str, float] = {"continuous": continuous, "n_paths": float(n_paths)}
+    styles = {
+        "none": ("Discrete monitoring (raw)", PALETTE[1], "o"),
+        "bgk": ("BGK continuity correction", PALETTE[2], "s"),
+        "bridge": ("Brownian-bridge estimator", PALETTE[0], "D"),
+    }
+    for offset, (correction, (label, color, marker)) in enumerate(styles.items()):
+        prices, half = [], []
+        for i, m in enumerate(dates):
+            product = BarrierOption(
+                k,
+                1.0,
+                h,
+                "down-and-out",
+                "call",
+                m,
+                correction,
+                None if correction == "none" else sigma,
+            )
+            res = price_mc(_BS, product, n_paths=n_paths, method="cv", seed=5000 + 100 * offset + i)
+            assert res.std_error is not None
+            prices.append(res.price)
+            half.append(z_value(0.95) * res.std_error)
+        ax.errorbar(
+            dates,
+            prices,
+            yerr=half,
+            color=color,
+            marker=marker,
+            capsize=3,
+            label=label,
+            markersize=6,
+        )
+        out[f"{correction}_m{dates[0]}"] = prices[0]
+        out[f"{correction}_m{dates[-1]}"] = prices[-1]
+    ax.axhline(
+        continuous, color=INK, linestyle="--", linewidth=1.2, label="Continuous (Reiner-Rubinstein)"
+    )
+    ax.set_xscale("log", base=2)
+    ax.set_xlabel("Number of monitoring dates $m$ (log scale)")
+    ax.set_ylabel("Option price")
+    ax.set_title(f"Down-and-out call ($K = {k:g}$, $H = {h:g}$) vs monitoring frequency")
+    ax.legend()
+    save_figure(fig, outdir / "barrier_monitoring.png")
+    return out
+
+
 FIGURES: dict[str, FigureFunc] = {
     "convergence": fig_convergence,
     "error_vs_n": fig_error_vs_n,
+    "barrier_monitoring": fig_barrier_monitoring,
 }
 
 

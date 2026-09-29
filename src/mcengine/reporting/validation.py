@@ -27,10 +27,18 @@ from typing import Any
 
 import numpy as np
 
-from mcengine.engines.analytic import bs_digital_price, bs_price
+from mcengine.engines.analytic import (
+    barrier_price,
+    bs_digital_price,
+    bs_price,
+    geometric_asian_price,
+)
+from mcengine.engines.convolution import asian_arithmetic_price
 from mcengine.engines.monte_carlo import price_mc
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.products.asian import AsianOption
+from mcengine.products.barrier import BARRIER_TYPES, BarrierOption
 from mcengine.products.base import Product
 from mcengine.products.european import DigitalOption, EuropeanOption
 from mcengine.results import PricingResult
@@ -84,6 +92,7 @@ class ValidationRow:
     in_ci99: bool
     passed: bool
     elapsed_s: float
+    diagnostics: dict[str, float]
 
 
 def run_case(case: ValidationCase, scale: float = 1.0) -> ValidationRow:
@@ -110,6 +119,7 @@ def run_case(case: ValidationCase, scale: float = 1.0) -> ValidationRow:
         in_ci99=result.contains(ref, CI_LEVEL),
         passed=abs(result.error_in_se(ref)) < PASS_TOL_SE,
         elapsed_s=result.elapsed_s,
+        diagnostics=dict(result.diagnostics),
     )
 
 
@@ -284,9 +294,51 @@ def _european_cases() -> list[ValidationCase]:
     return cases
 
 
+def _asian_cases() -> list[ValidationCase]:
+    m = _BS
+    cases: list[ValidationCase] = []
+    geo = AsianOption(100.0, 1.0, 12, "call", "geometric")
+    kv = geometric_asian_price(m.s0, 100.0, geo.monitoring_times(), m.r, m.sigma, m.q)
+    for method in ("plain", "antithetic"):
+        cid = f"gbm-asian-geo-call-12-{method}"
+        cases.append(mc_case(cid, "GBM", m, geo, method, _N_EURO, kv, "Kemna-Vorst"))
+    specs = [
+        ("call", 12, ("plain", "antithetic", "cv")),
+        ("put", 12, ("cv",)),
+        ("call", 52, ("cv",)),
+    ]
+    for kind, n_fix, methods in specs:
+        product = AsianOption(100.0, 1.0, n_fix, kind, "arithmetic")
+
+        def reference(p: AsianOption = product) -> float:
+            return asian_arithmetic_price(m, p)
+
+        for method in methods:
+            cid = f"gbm-asian-arith-{kind}-{n_fix}-{method}"
+            cases.append(
+                mc_case(cid, "GBM", m, product, method, _N_EURO, reference, "Recursive convolution")
+            )
+    return cases
+
+
+def _barrier_cases() -> list[ValidationCase]:
+    m = _BS
+    cases: list[ValidationCase] = []
+    for barrier_type in BARRIER_TYPES:
+        barrier = 90.0 if barrier_type.startswith("down") else 120.0
+        for kind in ("call", "put"):
+            product = BarrierOption(100.0, 1.0, barrier, barrier_type, kind, 50, "bridge", m.sigma)
+            ref = barrier_price(m.s0, 100.0, barrier, 1.0, m.r, m.sigma, m.q, barrier_type, kind)
+            cid = f"gbm-barrier-{barrier_type}-{kind}-bridge"
+            cases.append(
+                mc_case(cid, "GBM", m, product, "plain", _N_EURO, ref, "Reiner-Rubinstein")
+            )
+    return cases
+
+
 def all_cases() -> list[ValidationCase]:
     """The full validation registry, in table order."""
-    return [*_european_cases()]
+    return [*_european_cases(), *_asian_cases(), *_barrier_cases()]
 
 
 #: Case identifiers used in the confidence-interval coverage study.
@@ -296,6 +348,8 @@ COVERAGE_CASE_IDS: tuple[str, ...] = (
     "gbm-euro-call-100-cv",
     "gbm-euro-call-120-cv",
     "gbm-digital-call-plain",
+    "gbm-asian-arith-call-12-cv",
+    "gbm-barrier-down-and-out-call-bridge",
 )
 
 
