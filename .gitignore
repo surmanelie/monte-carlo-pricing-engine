@@ -19,3 +19,4 @@ htmlcov/
 .streamlit/secrets.toml
 .DS_Store
 Thumbs.db
+docs/figures/
