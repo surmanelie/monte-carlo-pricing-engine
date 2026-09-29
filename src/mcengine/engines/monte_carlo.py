@@ -39,6 +39,7 @@ from mcengine._validation import require_choice, require_int_at_least
 from mcengine.engines.analytic import geometric_asian_price
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.products.american import AmericanOption
 from mcengine.products.asian import AsianOption
 from mcengine.products.base import Product, time_indices
 from mcengine.random.generators import make_rng
@@ -204,6 +205,8 @@ def price_mc(
     started = time.perf_counter()
     require_choice("method", method, METHODS)
     require_int_at_least("n_paths", n_paths, 2)
+    if isinstance(product, AmericanOption):
+        raise ValueError("early-exercise products need price_lsm (Longstaff-Schwartz)")
     if method == "antithetic" and n_paths % 2:
         raise ValueError(f"antithetic sampling needs an even n_paths, got {n_paths}")
     gen = make_rng(seed, rng)
