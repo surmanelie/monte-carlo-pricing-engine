@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-09-29
+
+### Added
+- Scrambled Sobol sequences with Brownian-bridge path construction and randomised QMC
+  (independent scramblings, honest standard errors) as `method="qmc"`.
+- Importance sampling by a constant Girsanov drift shift with likelihood-ratio weights
+  (`method="is"`), default shift centring the terminal price at the strike, and a
+  variance-reduction diagnostic.
+- Optional Numba backend (`[fast]` extra) for the Heston QE scheme and the LSM pricing
+  pass, parallel over paths, identical to the NumPy implementation for the same seed.
+- Benchmarks (`scripts/benchmark.py`, pytest-benchmark suite in `tests/benchmarks`):
+  throughput per model/backend, RMSE vs wall-clock time per method, efficiency
+  (variance x time) relative to plain Monte Carlo.
+- Validation rows for QMC, importance sampling and the Numba backend.
+- Figure: error vs wall-clock time for all methods.
+
+### Changed
+- Merton simulation builds one Poisson inverse-CDF table per distinct step length.
+
 ## [0.5.0] - 2026-09-29
 
 ### Added

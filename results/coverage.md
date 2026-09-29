@@ -10,3 +10,4 @@
 | Merton | European call K=100 T=1 | `mc-plain` | 20,000 | 1000 | 95.3% | 98.9% | +0.011 | 1.012 |
 | GBM | European call K=100 T=1: gamma | `mc-pathwise` | 20,000 | 1000 | 94.9% | 99.3% | -0.022 | 0.998 |
 | GBM | Digital call K=100 T=1: gamma | `mc-lr` | 20,000 | 1000 | 95.2% | 99.3% | +0.011 | 0.980 |
+| GBM | European call K=140 T=1 | `mc-is` | 20,000 | 1000 | 94.0% | 98.3% | -0.037 | 1.034 |

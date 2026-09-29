@@ -63,5 +63,14 @@
 | GBM | Digital call K=100 T=1: delta | `mc-lr` | 100,000 | 1 | 0.0187 | [0.0185, 0.0188] | 0.0188 | Black-Scholes delta | -1.14 | yes | ✅ |
 | GBM | Digital call K=100 T=1: gamma | `mc-lr` | 100,000 | 1 | -0.0003 | [-0.0003, -0.0003] | -0.0003 | Black-Scholes gamma | +0.85 | yes | ✅ |
 | GBM | Digital call K=100 T=1: vega | `mc-lr` | 100,000 | 1 | -0.6371 | [-0.6654, -0.6087] | -0.6567 | Black-Scholes vega | +1.36 | yes | ✅ |
+| GBM | European call K=100 T=1 | `qmc-sobol-bb` | 131,072 | 1 | 10.4509 | [10.4502, 10.4516] | 10.4506 | Black-Scholes | +0.85 | yes | ✅ |
+| GBM | Asian arith. call K=100 T=1 m=12 | `qmc-sobol-bb` | 131,072 | 12 | 6.1559 | [6.1550, 6.1569] | 6.1560 | Recursive convolution | -0.22 | yes | ✅ |
+| GBM | down-and-out call K=100 H=90 T=1 | `qmc-sobol-bb` | 131,072 | 50 | 8.6714 | [8.6626, 8.6802] | 8.6655 | Reiner-Rubinstein | +1.31 | yes | ✅ |
+| GBM | European call K=140 T=1 | `mc-is` | 100,000 | 1 | 0.7804 | [0.7749, 0.7858] | 0.7850 | Black-Scholes | -1.67 | yes | ✅ |
+| GBM | European call K=180 T=1 | `mc-is` | 100,000 | 1 | 0.0287 | [0.0285, 0.0290] | 0.0286 | Black-Scholes | +0.92 | yes | ✅ |
+| GBM | Digital call K=150 T=1 | `mc-is` | 100,000 | 1 | 0.0286 | [0.0283, 0.0288] | 0.0288 | e^{-rT} N(d2) | -1.33 | yes | ✅ |
+| Heston QE (Δt = 1/50) | European call K=100 T=1 | `qmc-sobol-bb` | 131,072 | 50 | 8.9274 | [8.9180, 8.9368] | 8.9294 | Gil-Pelaez (little trap) | -0.42 | yes | ✅ |
+| Heston QE, Numba (Δt = 1/50) | European call K=100 T=1 | `mc-plain` | 100,000 | 50 | 8.8828 | [8.8185, 8.9471] | 8.9294 | Gil-Pelaez (little trap) | -1.42 | yes | ✅ |
+| Merton | European call K=100 T=1 | `qmc-sobol-bb` | 131,072 | 1 | 12.7592 | [12.7573, 12.7612] | 12.7613 | Merton series | -2.04 | yes | ✅ |
 
-63/63 rows pass (|error| < 4 SE); 62/63 references lie inside the 99% confidence interval (about 0.6 misses expected by chance for unbiased estimators).
+72/72 rows pass (|error| < 4 SE); 71/72 references lie inside the 99% confidence interval (about 0.7 misses expected by chance for unbiased estimators).
