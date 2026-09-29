@@ -26,5 +26,18 @@
 | GBM | up-and-out put K=100 H=120 T=1 | `mc-plain` | 100,000 | 50 | 5.3772 | [5.3237, 5.4307] | 5.3601 | Reiner-Rubinstein | +0.63 | yes | ✅ |
 | GBM | up-and-in call K=100 H=120 T=1 | `mc-plain` | 100,000 | 50 | 9.2409 | [9.1476, 9.3343] | 9.2745 | Reiner-Rubinstein | -0.70 | yes | ✅ |
 | GBM | up-and-in put K=100 H=120 T=1 | `mc-plain` | 100,000 | 50 | 0.2150 | [0.2060, 0.2241] | 0.2134 | Reiner-Rubinstein | +0.36 | yes | ✅ |
+| GBM S0=36 σ=0.2 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 4.4732 | [4.4552, 4.4911] | 4.4778 | CRR Bermudan tree (N=5000, BBS-Richardson) | -0.51 | yes | ✅ |
+| GBM S0=36 σ=0.2 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 4.8238 | [4.8021, 4.8456] | 4.8402 | CRR Bermudan tree (N=10000, BBS-Richardson) | -1.47 | yes | ✅ |
+| GBM S0=36 σ=0.4 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 7.0942 | [7.0569, 7.1315] | 7.1013 | CRR Bermudan tree (N=5000, BBS-Richardson) | -0.37 | yes | ✅ |
+| GBM S0=36 σ=0.4 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 8.5025 | [8.4583, 8.5466] | 8.5068 | CRR Bermudan tree (N=10000, BBS-Richardson) | -0.19 | yes | ✅ |
+| GBM S0=40 σ=0.2 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 2.3063 | [2.2893, 2.3232] | 2.3141 | CRR Bermudan tree (N=5000, BBS-Richardson) | -0.90 | yes | ✅ |
+| GBM S0=40 σ=0.2 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 2.8943 | [2.8735, 2.9151] | 2.8846 | CRR Bermudan tree (N=10000, BBS-Richardson) | +0.92 | yes | ✅ |
+| GBM S0=40 σ=0.4 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 5.2793 | [5.2440, 5.3146] | 5.3120 | CRR Bermudan tree (N=5000, BBS-Richardson) | -1.82 | yes | ✅ |
+| GBM S0=40 σ=0.4 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 6.9135 | [6.8707, 6.9562] | 6.9171 | CRR Bermudan tree (N=10000, BBS-Richardson) | -0.17 | yes | ✅ |
+| GBM S0=44 σ=0.2 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 1.1181 | [1.1052, 1.1311] | 1.1099 | CRR Bermudan tree (N=5000, BBS-Richardson) | +1.25 | yes | ✅ |
+| GBM S0=44 σ=0.2 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 1.6714 | [1.6545, 1.6884] | 1.6898 | CRR Bermudan tree (N=10000, BBS-Richardson) | -2.12 | yes | ✅ |
+| GBM S0=44 σ=0.4 | American put K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 3.9597 | [3.9276, 3.9918] | 3.9477 | CRR Bermudan tree (N=5000, BBS-Richardson) | +0.74 | yes | ✅ |
+| GBM S0=44 σ=0.4 | American put K=40 T=2 (100 dates) | `lsm` | 100,000 | 100 | 5.6122 | [5.5720, 5.6524] | 5.6412 | CRR Bermudan tree (N=10000, BBS-Richardson) | -1.42 | yes | ✅ |
+| GBM S0=40 σ=0.2 | American call K=40 T=1 (50 dates) | `lsm` | 100,000 | 50 | 4.4212 | [4.3840, 4.4585] | 4.3958 | Black-Scholes (no early exercise) | +1.34 | yes | ✅ |
 
-26/26 rows pass (|error| < 4 SE); 25/26 references lie inside the 99% confidence interval (about 0.3 misses expected by chance for unbiased estimators).
+39/39 rows pass (|error| < 4 SE); 38/39 references lie inside the 99% confidence interval (about 0.4 misses expected by chance for unbiased estimators).

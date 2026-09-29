@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-09-29
+
+### Added
+- `AmericanOption` product (Bermudan exercise on an equally spaced grid of dates).
+- Cox-Ross-Rubinstein binomial tree for European, American and Bermudan exercise, with
+  Black-Scholes smoothing and Richardson extrapolation (BBSR, Broadie-Detemple 1996) and
+  early-exercise boundary extraction.
+- Longstaff-Schwartz least-squares Monte Carlo: in-the-money regression, weighted
+  Laguerre or monomial basis, independent pricing paths (low-biased estimator), chunked
+  pricing pass, in-sample value reported as a diagnostic, training-support-aware
+  exercise boundary.
+- Validation on the Longstaff & Schwartz (2001) Table 1 grid against a Bermudan CRR tree
+  (N = 5000 steps per year) and American call = European call.
+- Figure: early-exercise boundary, LSM vs tree.
+
+### Changed
+- `price_mc` rejects early-exercise products and points to `price_lsm`.
+
 ## [0.2.0] - 2026-09-29
 
 ### Added

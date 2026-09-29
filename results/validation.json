@@ -15,7 +15,7 @@
     "error_se": 2.3894656336338413,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.009193699981551617,
+    "elapsed_s": 0.015343700011726469,
     "diagnostics": {}
   },
   {
@@ -34,7 +34,7 @@
     "error_se": 0.299023652785448,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.0065864999778568745,
+    "elapsed_s": 0.010519800009205937,
     "diagnostics": {}
   },
   {
@@ -53,7 +53,7 @@
     "error_se": 1.3377971720039423,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.012453600007575005,
+    "elapsed_s": 0.020923600008245558,
     "diagnostics": {
       "beta": 0.6727818110984272,
       "vr_factor": 6.875818935750532,
@@ -76,7 +76,7 @@
     "error_se": -0.4707629933297231,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.008438199991360307,
+    "elapsed_s": 0.013936200004536659,
     "diagnostics": {}
   },
   {
@@ -95,7 +95,7 @@
     "error_se": -0.6813007786698952,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.0060801999643445015,
+    "elapsed_s": 0.015040299971587956,
     "diagnostics": {}
   },
   {
@@ -114,7 +114,7 @@
     "error_se": -3.0275980532503937,
     "in_ci99": false,
     "passed": true,
-    "elapsed_s": 0.012173599970992655,
+    "elapsed_s": 0.01748280000174418,
     "diagnostics": {
       "beta": 0.3184097122757075,
       "vr_factor": 2.27480771265906,
@@ -137,7 +137,7 @@
     "error_se": 1.5742420980350218,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.008502600016072392,
+    "elapsed_s": 0.01263509999262169,
     "diagnostics": {}
   },
   {
@@ -156,7 +156,7 @@
     "error_se": -0.3402588000386805,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.007891599962022156,
+    "elapsed_s": 0.016012199979741126,
     "diagnostics": {}
   },
   {
@@ -175,7 +175,7 @@
     "error_se": 0.6141178508179564,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.012229799991473556,
+    "elapsed_s": 0.0226801999961026,
     "diagnostics": {
       "beta": -0.3262936402981353,
       "vr_factor": 2.384899552708043,
@@ -198,7 +198,7 @@
     "error_se": 1.0465661349234705,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.00945269997464493,
+    "elapsed_s": 0.012648999982047826,
     "diagnostics": {}
   },
   {
@@ -217,7 +217,7 @@
     "error_se": 1.07141873254647,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.012816399976145476,
+    "elapsed_s": 0.02232180000282824,
     "diagnostics": {
       "beta": 0.018046536911828434,
       "vr_factor": 2.4616314577909177,
@@ -240,7 +240,7 @@
     "error_se": -1.1040051960683395,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.11471130000427365,
+    "elapsed_s": 0.13940919999731705,
     "diagnostics": {}
   },
   {
@@ -259,7 +259,7 @@
     "error_se": -1.4749222266907747,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.07664319995092228,
+    "elapsed_s": 0.14671129995258525,
     "diagnostics": {}
   },
   {
@@ -278,7 +278,7 @@
     "error_se": -0.4274439891989327,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.0755627000471577,
+    "elapsed_s": 0.17325019999407232,
     "diagnostics": {}
   },
   {
@@ -297,7 +297,7 @@
     "error_se": -0.3696866435358664,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.06658509996486828,
+    "elapsed_s": 0.12005199998384342,
     "diagnostics": {}
   },
   {
@@ -316,7 +316,7 @@
     "error_se": 0.37894503983466954,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.11534020002000034,
+    "elapsed_s": 0.17383019998669624,
     "diagnostics": {
       "beta": 1.0315871600525905,
       "vr_factor": 1253.6394805340778,
@@ -339,7 +339,7 @@
     "error_se": 0.03701560939611133,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.11961380002321675,
+    "elapsed_s": 0.1997370999888517,
     "diagnostics": {
       "beta": 0.9761705898163916,
       "vr_factor": 1565.5984357434177,
@@ -362,7 +362,7 @@
     "error_se": 0.7121315581221829,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.46834950003540143,
+    "elapsed_s": 0.7123737000511028,
     "diagnostics": {
       "beta": 1.0342617704924242,
       "vr_factor": 1326.5061637238325,
@@ -385,7 +385,7 @@
     "error_se": -0.4036679917650202,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5767166999867186,
+    "elapsed_s": 1.0031782999867573,
     "diagnostics": {}
   },
   {
@@ -404,7 +404,7 @@
     "error_se": 1.4337636558540776,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5616923000197858,
+    "elapsed_s": 1.0171314000035636,
     "diagnostics": {}
   },
   {
@@ -423,7 +423,7 @@
     "error_se": -0.17808914966349923,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5666472999728285,
+    "elapsed_s": 1.047276100027375,
     "diagnostics": {}
   },
   {
@@ -442,7 +442,7 @@
     "error_se": -1.4429126310735105,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5511693999869749,
+    "elapsed_s": 1.0782724000164308,
     "diagnostics": {}
   },
   {
@@ -461,7 +461,7 @@
     "error_se": 0.3973022981601473,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.6045400999719277,
+    "elapsed_s": 1.1106960999895819,
     "diagnostics": {}
   },
   {
@@ -480,7 +480,7 @@
     "error_se": 0.6251532627115496,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5717564999940805,
+    "elapsed_s": 1.0663177000242285,
     "diagnostics": {}
   },
   {
@@ -499,7 +499,7 @@
     "error_se": -0.7045413936576764,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5633365999674425,
+    "elapsed_s": 1.1298540999996476,
     "diagnostics": {}
   },
   {
@@ -518,7 +518,306 @@
     "error_se": 0.3559300958079842,
     "in_ci99": true,
     "passed": true,
-    "elapsed_s": 0.5748182999668643,
+    "elapsed_s": 1.0812014999683015,
     "diagnostics": {}
+  },
+  {
+    "case_id": "gbm-american-put-s36-v0.2-t1-lsm",
+    "model": "GBM S0=36 \u03c3=0.2",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 4.4731827005792795,
+    "std_error": 0.009151496206696735,
+    "ci_low": 4.455246097609499,
+    "ci_high": 4.49111930354906,
+    "reference": 4.477810454493503,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": -0.505682765932551,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 2.9876056000357494,
+    "diagnostics": {
+      "in_sample_price": 4.475801360347731,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s36-v0.2-t2-lsm",
+    "model": "GBM S0=36 \u03c3=0.2",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 4.823841636506187,
+    "std_error": 0.011110331434813788,
+    "ci_low": 4.802065787037649,
+    "ci_high": 4.845617485974725,
+    "reference": 4.840188344347797,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": -1.4713069486287307,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 5.446390400000382,
+    "diagnostics": {
+      "in_sample_price": 4.8534539894764315,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s36-v0.4-t1-lsm",
+    "model": "GBM S0=36 \u03c3=0.4",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 7.0942035125941425,
+    "std_error": 0.019053211930324616,
+    "ci_low": 7.056859903420897,
+    "ci_high": 7.131547121767388,
+    "reference": 7.101277289962338,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": -0.3712642988522713,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 3.0103697000304237,
+    "diagnostics": {
+      "in_sample_price": 7.100879833563891,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s36-v0.4-t2-lsm",
+    "model": "GBM S0=36 \u03c3=0.4",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 8.502454439613276,
+    "std_error": 0.022541003800274705,
+    "ci_low": 8.458274883989358,
+    "ci_high": 8.546633995237194,
+    "reference": 8.506790420210834,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": -0.19235969418119606,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 6.146848300006241,
+    "diagnostics": {
+      "in_sample_price": 8.49096866627516,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s40-v0.2-t1-lsm",
+    "model": "GBM S0=40 \u03c3=0.2",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 2.3062512811792732,
+    "std_error": 0.008664310557410146,
+    "ci_low": 2.289269544535879,
+    "ci_high": 2.3232330178226674,
+    "reference": 2.3140833399950456,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": -0.9039448394510687,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 2.537192399962805,
+    "diagnostics": {
+      "in_sample_price": 2.324667883266647,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s40-v0.2-t2-lsm",
+    "model": "GBM S0=40 \u03c3=0.2",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 2.8943212569039964,
+    "std_error": 0.010599603800408254,
+    "ci_low": 2.8735464152048023,
+    "ci_high": 2.9150960986031906,
+    "reference": 2.88456403868591,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": 0.9205266915458175,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 4.353191700007301,
+    "diagnostics": {
+      "in_sample_price": 2.8943157861244293,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s40-v0.4-t1-lsm",
+    "model": "GBM S0=40 \u03c3=0.4",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 5.27927065402392,
+    "std_error": 0.0180051261490375,
+    "ci_low": 5.243981255234706,
+    "ci_high": 5.314560052813134,
+    "reference": 5.3119813764297605,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": -1.81674497224166,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 2.4557020000065677,
+    "diagnostics": {
+      "in_sample_price": 5.301303753623095,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s40-v0.4-t2-lsm",
+    "model": "GBM S0=40 \u03c3=0.4",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 6.9134606607173374,
+    "std_error": 0.0218131506189252,
+    "ci_low": 6.870707671114896,
+    "ci_high": 6.9562136503197785,
+    "reference": 6.917079466169973,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": -0.16590017260028014,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 5.301884499960579,
+    "diagnostics": {
+      "in_sample_price": 6.914182460679884,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s44-v0.2-t1-lsm",
+    "model": "GBM S0=44 \u03c3=0.2",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 1.1181462365358488,
+    "std_error": 0.006619651899529978,
+    "ci_low": 1.1051719572225778,
+    "ci_high": 1.1311205158491198,
+    "reference": 1.1098848619515465,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": 1.248007404269839,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 1.5897772000171244,
+    "diagnostics": {
+      "in_sample_price": 1.1053885379946813,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s44-v0.2-t2-lsm",
+    "model": "GBM S0=44 \u03c3=0.2",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 1.671449940865541,
+    "std_error": 0.008654159607910055,
+    "ci_low": 1.654488099717576,
+    "ci_high": 1.688411782013506,
+    "reference": 1.6898374057351486,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": -2.1246967588627736,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 3.4814713000087067,
+    "diagnostics": {
+      "in_sample_price": 1.6974197020729456,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s44-v0.4-t1-lsm",
+    "model": "GBM S0=44 \u03c3=0.4",
+    "product": "American put K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 3.959722492084644,
+    "std_error": 0.016377475889653496,
+    "ci_low": 3.92762322918325,
+    "ci_high": 3.991821754986038,
+    "reference": 3.947675506805179,
+    "reference_method": "CRR Bermudan tree (N=5000, BBS-Richardson)",
+    "error_se": 0.7355825379096185,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 2.044866300013382,
+    "diagnostics": {
+      "in_sample_price": 3.9443534441254413,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-put-s44-v0.4-t2-lsm",
+    "model": "GBM S0=44 \u03c3=0.4",
+    "product": "American put K=40 T=2 (100 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 100,
+    "price": 5.612190896411108,
+    "std_error": 0.020507164153376663,
+    "ci_low": 5.571997593245439,
+    "ci_high": 5.652384199576777,
+    "reference": 5.641232522915704,
+    "reference_method": "CRR Bermudan tree (N=10000, BBS-Richardson)",
+    "error_se": -1.4161697974126835,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 5.0089658999932,
+    "diagnostics": {
+      "in_sample_price": 5.632607314948623,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
+  },
+  {
+    "case_id": "gbm-american-call-no-dividend-lsm",
+    "model": "GBM S0=40 \u03c3=0.2",
+    "product": "American call K=40 T=1 (50 dates)",
+    "method": "lsm",
+    "n_paths": 100000,
+    "n_steps": 50,
+    "price": 4.421244434823984,
+    "std_error": 0.019017359359423322,
+    "ci_low": 4.383971095398458,
+    "ci_high": 4.4585177742495095,
+    "reference": 4.3958196610504,
+    "reference_method": "Black-Scholes (no early exercise)",
+    "error_se": 1.3369245063450788,
+    "in_ci99": true,
+    "passed": true,
+    "elapsed_s": 2.7271013000281528,
+    "diagnostics": {
+      "in_sample_price": 4.418949276825667,
+      "n_train": 100000.0,
+      "degree": 3.0
+    }
   }
 ]
