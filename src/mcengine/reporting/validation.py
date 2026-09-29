@@ -39,6 +39,8 @@ from mcengine.engines.fourier import gil_pelaez_price
 from mcengine.engines.lsm import price_lsm
 from mcengine.engines.monte_carlo import price_mc
 from mcengine.engines.tree import price_tree
+from mcengine.greeks.analytic import bs_greeks, digital_greeks
+from mcengine.greeks.monte_carlo import mc_greeks
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
 from mcengine.models.heston import Heston
@@ -465,6 +467,45 @@ def _merton_cases() -> list[ValidationCase]:
     return cases
 
 
+def greek_case(
+    case_id: str,
+    product: EuropeanOption | DigitalOption,
+    greek: str,
+    method: str,
+    reference: float,
+) -> ValidationCase:
+    """Monte Carlo Greek (as a :class:`PricingResult`) against its closed form."""
+
+    def run(seed: int, scale: float) -> PricingResult:
+        n = _paths(_N_EURO, scale)
+        res = mc_greeks(_BS, product, method=method, n_paths=n, seed=seed)
+        value, se = float(getattr(res, greek)), res.std_errors[greek]
+        half = z_value(0.95) * se
+        return PricingResult(
+            value, se, value - half, value + half, n, 1, f"mc-{method}", res.elapsed_s
+        )
+
+    label = f"{product.label}: {greek}"
+    return ValidationCase(case_id, "GBM", label, run, lambda: (reference, f"Black-Scholes {greek}"))
+
+
+def _greek_cases() -> list[ValidationCase]:
+    m = _BS
+    call = EuropeanOption(100.0, 1.0, "call")
+    digital = DigitalOption(100.0, 1.0, "call")
+    call_ref = bs_greeks(m.s0, 100.0, 1.0, m.r, m.sigma).as_dict()
+    dig_ref = digital_greeks(m.s0, 100.0, 1.0, m.r, m.sigma).as_dict()
+    cases: list[ValidationCase] = []
+    for greek in ("delta", "gamma", "vega"):
+        for method in ("bump", "pathwise", "lr"):
+            cid = f"gbm-greek-call-{greek}-{method}"
+            cases.append(greek_case(cid, call, greek, method, call_ref[greek]))
+    for greek, method in (("delta", "bump"), ("delta", "lr"), ("gamma", "lr"), ("vega", "lr")):
+        cid = f"gbm-greek-digital-{greek}-{method}"
+        cases.append(greek_case(cid, digital, greek, method, dig_ref[greek]))
+    return cases
+
+
 def all_cases() -> list[ValidationCase]:
     """The full validation registry, in table order."""
     return [
@@ -474,6 +515,7 @@ def all_cases() -> list[ValidationCase]:
         *_american_cases(),
         *_heston_cases(),
         *_merton_cases(),
+        *_greek_cases(),
     ]
 
 
@@ -487,6 +529,8 @@ COVERAGE_CASE_IDS: tuple[str, ...] = (
     "gbm-asian-arith-call-12-cv",
     "gbm-barrier-down-and-out-call-bridge",
     "merton-call-100-plain",
+    "gbm-greek-call-gamma-pathwise",
+    "gbm-greek-digital-gamma-lr",
 )
 
 
