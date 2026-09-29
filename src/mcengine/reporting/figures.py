@@ -9,6 +9,7 @@ measured (e.g. fitted convergence slopes). :func:`make_all` stores those numbers
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -20,12 +21,15 @@ from mcengine.engines.fourier import fourier_prices, gil_pelaez_price
 from mcengine.engines.lsm import fit_lsm
 from mcengine.engines.monte_carlo import price_mc, simulate_discounted_payoffs
 from mcengine.engines.tree import crr_exercise_boundary
+from mcengine.greeks.analytic import bs_greeks, digital_greeks
+from mcengine.greeks.monte_carlo import mc_greeks
+from mcengine.hedging.delta_hedge import HedgeResult, fit_std_slope, hedging_experiment
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
 from mcengine.models.heston import Heston
 from mcengine.products.american import AmericanOption
 from mcengine.products.barrier import BarrierOption
-from mcengine.products.european import EuropeanOption
+from mcengine.products.european import DigitalOption, EuropeanOption
 from mcengine.reporting.style import (
     INK,
     INK_SECONDARY,
@@ -35,6 +39,7 @@ from mcengine.reporting.style import (
     save_figure,
 )
 from mcengine.reporting.validation import HESTON, MERTON
+from mcengine.results import GreeksResult
 from mcengine.stats import z_value
 from mcengine.volatility.implied import implied_vol
 
@@ -341,6 +346,144 @@ def fig_heston_scheme_bias(outdir: Path, quick: bool = False) -> dict[str, float
     return out
 
 
+def fig_greeks(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """Bump / pathwise / likelihood-ratio estimates of delta, gamma, vega vs closed forms."""
+    n_paths = 20_000 if quick else 200_000
+    products: dict[str, tuple[EuropeanOption | DigitalOption, GreeksResult]] = {
+        "call": (EuropeanOption(100.0, 1.0), bs_greeks(100.0, 100.0, 1.0, 0.05, 0.2)),
+        "digital": (DigitalOption(100.0, 1.0), digital_greeks(100.0, 100.0, 1.0, 0.05, 0.2)),
+    }
+    methods = (
+        ("bump", "Bump & revalue (CRN)"),
+        ("pathwise", "Pathwise"),
+        ("lr", "Likelihood ratio"),
+    )
+    fig, axes = new_figure(2, 3, width=11.0, height=6.2)
+    out: dict[str, float] = {"n_paths": float(n_paths)}
+    for row, (pname, (product, ref)) in enumerate(products.items()):
+        results = {
+            m: mc_greeks(_BS, product, method=m, n_paths=n_paths, seed=31 + i)
+            for i, (m, _) in enumerate(methods)
+        }
+        for col, greek in enumerate(("delta", "gamma", "vega")):
+            ax = axes[row, col]
+            exact = float(getattr(ref, greek))
+            ax.axhline(exact, color=INK, linestyle="--", linewidth=1.2, label="Closed form")
+            for i, (m, label) in enumerate(methods):
+                res = results[m]
+                value, se = float(getattr(res, greek)), res.std_errors[greek]
+                ax.errorbar(
+                    [i],
+                    [value],
+                    yerr=[z_value(0.95) * se],
+                    fmt="o",
+                    color=PALETTE[i],
+                    capsize=4,
+                    markersize=7,
+                    label=label,
+                )
+                out[f"{pname}_{greek}_{m}_se"] = se
+                out[f"{pname}_{greek}_{m}_err_se"] = (value - exact) / se if se > 0 else math.inf
+            ax.set_xticks(range(3), ["bump", "pathwise", "LR"])
+            ax.set_xlim(-0.6, 2.6)
+            ax.set_title(f"{'European call' if pname == 'call' else 'Digital call'}: {greek}")
+            if pname == "digital":
+                ax.annotate(
+                    "pathwise ≡ 0\n(payoff not differentiable)",
+                    xy=(1, 0.0),
+                    xytext=(1.1, 0.5),
+                    textcoords=("data", "axes fraction"),
+                    fontsize=8,
+                    color=INK_SECONDARY,
+                    arrowprops={"arrowstyle": "->", "color": INK_SECONDARY},
+                )
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="outside lower center", ncols=4)
+    fig.suptitle(
+        f"Monte Carlo Greeks under GBM ({n_paths:,} paths, 95 % CI) vs Black-Scholes",
+        fontweight="bold",
+    )
+    save_figure(fig, outdir / "greeks.png")
+    return out
+
+
+def _hedging_runs(quick: bool) -> dict[str, list[HedgeResult]]:
+    n_paths = 4_000 if quick else 50_000
+    freqs = [1, 2, 4, 7, 12, 21, 42, 84, 252]
+    heston_iv = float(
+        implied_vol(gil_pelaez_price(HESTON, 100.0, 1.0), 100.0, 100.0, 1.0, HESTON.r)
+    )
+    return {
+        "gbm": hedging_experiment(
+            _BS, 100.0, 1.0, freqs, hedge_sigma=0.2, n_paths=n_paths, seed=41
+        ),
+        "gbm_cost": hedging_experiment(
+            _BS, 100.0, 1.0, freqs, hedge_sigma=0.2, cost_rate=0.001, n_paths=n_paths, seed=41
+        ),
+        "heston": hedging_experiment(
+            HESTON, 100.0, 1.0, freqs, hedge_sigma=heston_iv, n_paths=n_paths, seed=42
+        ),
+    }
+
+
+def fig_hedging(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """Hedging P&L histograms and standard deviation vs rebalancing frequency."""
+    runs = _hedging_runs(quick)
+    out: dict[str, float] = {}
+    # --- histograms
+    fig, axes = new_figure(1, 2, width=11.0, height=4.2)
+    shown = (4, 21, 252)
+    for ax, key, title, span in (
+        (axes[0], "gbm", "GBM (hedge volatility = true volatility)", (-8.0, 8.0)),
+        (axes[1], "heston", "Heston (Black-Scholes hedge, misspecified)", (-16.0, 8.0)),
+    ):
+        for i, res in enumerate(r for r in runs[key] if r.n_rebalance in shown):
+            ax.hist(
+                res.pnl,
+                bins=120,
+                range=span,
+                histtype="step",
+                linewidth=1.8,
+                density=True,
+                color=PALETTE[i],
+                label=f"N = {res.n_rebalance} (std {res.std:.2f})",
+            )
+        ax.set_xlabel("Discounted hedging P&L per option")
+        ax.set_ylabel("Density")
+        ax.set_title(title)
+        ax.legend()
+    save_figure(fig, outdir / "hedging_pnl.png")
+    # --- std vs N
+    fig, ax = new_figure()
+    labels = {
+        "gbm": "GBM, no costs",
+        "gbm_cost": "GBM, 10 bp proportional costs",
+        "heston": "Heston (misspecified hedge)",
+    }
+    for i, (key, label) in enumerate(labels.items()):
+        results = runs[key]
+        n = np.array([r.n_rebalance for r in results])
+        std = np.array([r.std for r in results])
+        slope = fit_std_slope(results)
+        out[f"{key}_slope"] = slope
+        out[f"{key}_std_N252"] = float(std[-1])
+        out[f"{key}_mean_N252"] = results[-1].mean
+        out[f"{key}_premium"] = results[-1].premium
+        ax.plot(n, std, "o-", color=PALETTE[i], label=f"{label} (slope {slope:.2f})")
+    gbm_std = np.array([r.std for r in runs["gbm"]])
+    n = np.array([r.n_rebalance for r in runs["gbm"]], dtype=float)
+    ax.plot(n, gbm_std[0] * n**-0.5, color=INK, linestyle="--", linewidth=1.0, label="$N^{-1/2}$")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel("Number of rebalancing dates $N$ (log scale)")
+    ax.set_ylabel("Std of discounted P&L (log scale)")
+    ax.set_title("Delta-hedging error of a short ATM call vs rebalancing frequency")
+    ax.legend()
+    save_figure(fig, outdir / "hedging_std.png")
+    out["n_paths"] = float(runs["gbm"][0].pnl.size)
+    return out
+
+
 FIGURES: dict[str, FigureFunc] = {
     "convergence": fig_convergence,
     "error_vs_n": fig_error_vs_n,
@@ -348,6 +491,8 @@ FIGURES: dict[str, FigureFunc] = {
     "exercise_boundary": fig_exercise_boundary,
     "smiles": fig_smiles,
     "heston_scheme_bias": fig_heston_scheme_bias,
+    "greeks": fig_greeks,
+    "hedging": fig_hedging,
 }
 
 
