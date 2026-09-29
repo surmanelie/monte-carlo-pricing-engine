@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.0] - 2026-09-29
+
+### Added
+- Typer command-line interface: `mcengine price | validate | figures | benchmark |
+  calibrate | version`, with Rich tables and an independent reference next to every
+  price when one exists.
+- Streamlit dashboard (`app/streamlit_app.py`): price with confidence interval,
+  reference and error in standard errors, convergence plot, sample paths, implied-volatility
+  smile and hedging P&L; cached computations; Streamlit Community Cloud instructions.
+- MkDocs Material documentation site with MathJax theory pages, API reference generated
+  from the docstrings, and a results page embedding the generated tables and figures;
+  deployed to GitHub Pages by `docs.yml`.
+- Three executed notebooks (walkthrough, Heston smile and calibration, Greeks and
+  hedging), built by `scripts/build_notebooks.py`.
+- `scripts/render_readme.py`: fills every numeric section of the README and the docs
+  summary tables from the generated results.
+
 ## [0.7.0] - 2026-09-29
 
 ### Added
