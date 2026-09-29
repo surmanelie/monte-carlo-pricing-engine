@@ -56,3 +56,12 @@ def test_deterministic_case_is_rejected() -> None:
     case = ValidationCase("x", "GBM", "p", run, lambda: (1.0, "ref"))
     with pytest.raises(ValueError, match="Monte Carlo"):
         run_case(case)
+
+
+@pytest.mark.parametrize(
+    "case_id", ["gbm-american-put-s36-v0.2-t1-lsm", "gbm-asian-arith-call-12-cv"]
+)
+def test_selected_cases_pass_at_small_scale(case_id: str) -> None:
+    case = next(c for c in all_cases() if c.case_id == case_id)
+    row = run_case(case, scale=0.1)
+    assert row.passed
