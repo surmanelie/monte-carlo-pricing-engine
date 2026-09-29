@@ -36,7 +36,10 @@ import numpy as np
 
 from mcengine._typing import FloatArray
 from mcengine._validation import require_choice, require_int_at_least
+from mcengine.engines.analytic import geometric_asian_price
 from mcengine.models.base import Model
+from mcengine.models.gbm import GBM
+from mcengine.products.asian import AsianOption
 from mcengine.products.base import Product, time_indices
 from mcengine.random.generators import make_rng
 from mcengine.results import PricingResult
@@ -74,8 +77,34 @@ def underlying_control(model: Model, maturity: float) -> ControlVariate:
     return ControlVariate("discounted-terminal", model.s0 * math.exp(-model.q * maturity), func)
 
 
+def geometric_asian_control(model: GBM, product: AsianOption) -> ControlVariate:
+    """Discounted geometric-average payoff with its Kemna-Vorst mean (Kemna & Vorst, 1990)."""
+    geometric = product.with_average("geometric")
+    disc = math.exp(-model.r * product.maturity)
+    mean = geometric_asian_price(
+        model.s0,
+        product.strike,
+        product.monitoring_times(),
+        model.r,
+        model.sigma,
+        model.q,
+        product.option_type,
+    )
+
+    def func(paths: FloatArray, times: FloatArray) -> FloatArray:
+        return disc * geometric.payoff(paths, times)
+
+    return ControlVariate("geometric-asian", mean, func)
+
+
 def default_control(model: Model, product: Product) -> ControlVariate:
-    """Standard control variate for ``product`` under ``model``."""
+    """Standard control variate for ``product`` under ``model``.
+
+    Arithmetic Asian options under GBM use the geometric Asian (Kemna-Vorst); every other
+    case uses the discounted terminal price.
+    """
+    if isinstance(model, GBM) and isinstance(product, AsianOption):
+        return geometric_asian_control(model, product)
     return underlying_control(model, product.maturity)
 
 
