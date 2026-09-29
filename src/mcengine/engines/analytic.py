@@ -41,6 +41,7 @@ from mcengine._typing import FloatArray
 from mcengine._validation import require_choice
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.models.merton import Merton
 from mcengine.products.asian import AsianOption
 from mcengine.products.barrier import BARRIER_TYPES, BGK_BETA, BarrierOption
 from mcengine.products.base import OPTION_TYPES, Product
@@ -246,6 +247,57 @@ def barrier_price_discrete_bgk(
     return barrier_price(s0, strike, shifted, maturity, r, sigma, q, barrier_type, option_type)
 
 
+def merton_price(
+    s0: float,
+    strike: float,
+    maturity: float,
+    r: float,
+    sigma: float,
+    lam: float,
+    mu_j: float,
+    delta_j: float,
+    q: float = 0.0,
+    option_type: str = "call",
+    tol: float = 1e-12,
+) -> float:
+    r"""Merton (1976) jump-diffusion price as a Poisson mixture of Black-Scholes prices.
+
+    .. math::
+
+        V = \sum_{n\ge0} e^{-\lambda'T}\frac{(\lambda'T)^n}{n!}\,
+        \mathrm{BS}\big(S_0, K, T, r_n, \sigma_n, q\big),\qquad
+        \lambda' = \lambda(1 + \bar k),\quad
+        \sigma_n^2 = \sigma^2 + \frac{n\delta^2}{T},\quad
+        r_n = r - \lambda\bar k + \frac{n\ln(1 + \bar k)}{T}.
+
+    The series is truncated once the remaining Poisson mass is below ``tol``; since every
+    term is bounded by ``S0`` (calls) or ``K`` (puts), the truncation error is at most
+    ``tol * max(S0, K)``.
+    """
+    require_choice("option_type", option_type, OPTION_TYPES)
+    if not 0.0 < tol < 1.0:
+        raise ValueError(f"tol must lie in (0, 1), got {tol}")
+    _check_inputs(np.asarray([s0, strike, maturity, sigma]), names=("s0, strike, maturity, sigma",))
+    if lam < 0.0 or delta_j < 0.0:
+        raise ValueError("lam and delta_j must be >= 0")
+    kbar = np.exp(mu_j + 0.5 * delta_j**2) - 1.0
+    lam_t = lam * (1.0 + kbar) * maturity
+    total, mass, n = 0.0, 0.0, 0
+    weight = np.exp(-lam_t)
+    while True:
+        sigma_n = np.sqrt(sigma**2 + n * delta_j**2 / maturity)
+        r_n = r - lam * kbar + n * np.log1p(kbar) / maturity
+        total += weight * float(bs_price(s0, strike, maturity, r_n, sigma_n, q, option_type))
+        mass += weight
+        if 1.0 - mass < tol or lam_t == 0.0:
+            break
+        n += 1
+        weight *= lam_t / n
+        if n > 10_000:  # pragma: no cover - guards against pathological inputs
+            raise ValueError("Merton series did not converge")
+    return float(total)
+
+
 def deterministic_result(price: float, method: str, started: float) -> PricingResult:
     """Wrap a deterministic price into a :class:`PricingResult`."""
     return PricingResult(
@@ -297,6 +349,21 @@ def price_analytic(model: Model, product: Product) -> PricingResult:
                 product.option_type,
             )
             return deterministic_result(price, "reiner-rubinstein", started)
+    if isinstance(model, Merton) and isinstance(product, EuropeanOption):
+        m2 = model
+        price = merton_price(
+            m2.s0,
+            product.strike,
+            product.maturity,
+            m2.r,
+            m2.sigma,
+            m2.lam,
+            m2.mu_j,
+            m2.delta_j,
+            m2.q,
+            product.option_type,
+        )
+        return deterministic_result(price, "merton-series", started)
     raise ValueError(
         f"no closed form for model {type(model).__name__} and product {type(product).__name__}"
     )
