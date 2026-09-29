@@ -1,0 +1,7 @@
+- **European call:** with 100,000 simulated paths, the Monte Carlo price is 10.5628, within 1.07% of the Black-Scholes price 10.4506 (+2.39 standard errors).
+- **Validation:** 72/72 Monte Carlo estimators agree with an independent reference within 4 SE; 71/72 references lie inside the 99 % confidence interval. RMSE decays with fitted slopes -0.478 (plain), -0.514 (antithetic), -0.511 (control variate) vs the theoretical -0.5.
+- **Variance reduction:** the geometric control variate divides the variance of the arithmetic Asian by 1,254; importance sampling divides that of a K = 180 call by 476; randomised QMC with a Brownian bridge divides that of a K = 140 call by 24,043.
+- **American put (Longstaff-Schwartz):** 4.4732 ± 0.0092 vs 4.4778 for the Bermudan CRR tree (S0 = 36, sigma = 0.2, T = 1); over the 12 cases of Longstaff & Schwartz's Table 1 the largest error is 2.12 SE.
+- **Heston:** in a Feller-violating case (ratio 0.04), full-truncation Euler is still biased by +0.276 at dt = 1/32, while Andersen's QE is at +0.029 (SE 0.021).
+- **Delta hedging:** the std of the hedging error scales like N^-0.47 under GBM, but only like N^-0.18 when a Heston world is hedged with Black-Scholes deltas.
+- **Calibration:** Heston fitted to a noisy synthetic surface (36 quotes, 10 bp noise) with an implied-vol RMSE of 8.2 bp in 2.0 s; rho recovered as -0.701 (true -0.700).
