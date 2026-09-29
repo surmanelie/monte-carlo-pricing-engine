@@ -6,7 +6,6 @@ import math
 
 import numpy as np
 import pytest
-from tests.conftest import TOL_SE
 
 from mcengine.engines.analytic import bs_digital_price, bs_price
 from mcengine.engines.monte_carlo import (
@@ -19,6 +18,7 @@ from mcengine.engines.monte_carlo import (
 )
 from mcengine.models.gbm import GBM
 from mcengine.products.european import DigitalOption, EuropeanOption
+from tests.conftest import TOL_SE
 
 N = 200_000
 
