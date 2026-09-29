@@ -48,13 +48,7 @@ jobs:
       - run: pip install -e ".[dev,fast,app]"
       - name: pytest (fast suite, coverage >= 90%)
         if: github.event_name != 'schedule'
-        run: pytest --cov --cov-report=term --cov-report=xml
+        run: pytest --cov --cov-report=term
       - name: pytest (full suite incl. slow)
         if: github.event_name == 'schedule'
-        run: pytest -m "" --cov --cov-report=term --cov-report=xml
-      - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.xml
-          fail_ci_if_error: false
+        run: pytest -m "" --cov --cov-report=term
