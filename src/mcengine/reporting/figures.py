@@ -16,6 +16,13 @@ from typing import Any
 
 import numpy as np
 
+from mcengine.calibration.heston_calibration import (
+    PARAM_NAMES,
+    VolSurface,
+    calibrate_heston,
+    model_vols,
+    synthetic_surface,
+)
 from mcengine.engines.analytic import barrier_price, bs_price
 from mcengine.engines.fourier import fourier_prices, gil_pelaez_price
 from mcengine.engines.lsm import fit_lsm
@@ -484,6 +491,70 @@ def fig_hedging(outdir: Path, quick: bool = False) -> dict[str, float]:
     return out
 
 
+#: Parameters of the synthetic calibration experiment (and the noise added to the quotes).
+CALIBRATION_TRUE = Heston(100.0, 0.02, 0.04, 1.5, 0.05, 0.6, -0.7)
+CALIBRATION_NOISE = 0.001
+
+
+def fig_calibration(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """Heston calibration to a noisy synthetic surface: fit and residual heatmap."""
+    maturities = (0.5, 1.0) if quick else (0.25, 0.5, 1.0, 2.0)
+    surface = synthetic_surface(
+        CALIBRATION_TRUE, maturities=maturities, noise_vol=CALIBRATION_NOISE, seed=2026
+    )
+    fit = calibrate_heston(surface, n_starts=1 if quick else 4, seed=7)
+    out: dict[str, float] = {
+        "noise_vol": CALIBRATION_NOISE,
+        "rmse_vol": fit.rmse_vol,
+        "max_abs_error_vol": fit.max_abs_error_vol,
+        "elapsed_s": fit.elapsed_s,
+        "n_quotes": float(surface.size),
+        "feller_ratio_fit": fit.feller_ratio,
+    }
+    for name in PARAM_NAMES:
+        out[f"true_{name}"] = float(getattr(CALIBRATION_TRUE, name))
+        out[f"fit_{name}"] = fit.params[name]
+
+    fig, axes = new_figure(1, 2, width=11.5, height=4.4)
+    ax = axes[0]
+    fine = np.linspace(surface.strikes.min(), surface.strikes.max(), 60)
+    for i, maturity in enumerate(maturities):
+        mask = surface.maturities == maturity
+        ax.plot(surface.strikes[mask] / surface.s0, surface.vols[mask], "o", color=PALETTE[i],
+                markersize=6, label=f"market, $T = {maturity:g}$")  # fmt: skip
+        grid = VolSurface(surface.s0, surface.r, surface.q, fine, np.full(fine.size, maturity),
+                          np.full(fine.size, 0.2))  # fmt: skip
+        ax.plot(fine / surface.s0, model_vols(fit.model, grid), color=PALETTE[i], linewidth=1.5)
+    ax.set_xlabel("Moneyness $K / S_0$")
+    ax.set_ylabel("Implied volatility")
+    ax.set_title("Synthetic market (dots, 10 bp noise) vs calibrated Heston (lines)")
+    ax.legend(fontsize=8)
+
+    ax = axes[1]
+    strikes = np.unique(surface.strikes)
+    grid_res = np.full((len(maturities), strikes.size), np.nan)
+    for i, maturity in enumerate(maturities):
+        for j, k in enumerate(strikes):
+            mask = (surface.maturities == maturity) & (surface.strikes == k)
+            grid_res[i, j] = fit.residuals[mask][0] * 1e4
+    limit = float(np.nanmax(np.abs(grid_res)))
+    image = ax.imshow(grid_res, cmap="RdBu_r", vmin=-limit, vmax=limit, aspect="auto")
+    for i in range(grid_res.shape[0]):
+        for j in range(grid_res.shape[1]):
+            value = grid_res[i, j]
+            ink = "white" if abs(value) > 0.6 * limit else INK
+            ax.text(j, i, f"{round(value):d}", ha="center", va="center", fontsize=8, color=ink)
+    ax.set_xticks(range(strikes.size), [f"{k / surface.s0:.2f}" for k in strikes])
+    ax.set_yticks(range(len(maturities)), [f"{t:g}" for t in maturities])
+    ax.set_xlabel("Moneyness $K / S_0$")
+    ax.set_ylabel("Maturity $T$ (years)")
+    ax.set_title(f"Residuals, model - market (bp); RMSE {fit.rmse_vol * 1e4:.1f} bp")
+    ax.grid(False)
+    fig.colorbar(image, ax=ax, label="Implied-vol residual (bp)")
+    save_figure(fig, outdir / "calibration.png")
+    return out
+
+
 FIGURES: dict[str, FigureFunc] = {
     "convergence": fig_convergence,
     "error_vs_n": fig_error_vs_n,
@@ -493,6 +564,7 @@ FIGURES: dict[str, FigureFunc] = {
     "heston_scheme_bias": fig_heston_scheme_bias,
     "greeks": fig_greeks,
     "hedging": fig_hedging,
+    "calibration": fig_calibration,
 }
 
 
