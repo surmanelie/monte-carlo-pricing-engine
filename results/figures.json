@@ -19,5 +19,10 @@
     "slope_antithetic": -0.5135495167807074,
     "slope_cv": -0.5114236568994567,
     "slope_plain": -0.4778452872742716
+  },
+  "exercise_boundary": {
+    "mean_abs_gap_deg3": 0.2860143226325187,
+    "mean_abs_gap_deg6": 0.12178551526805344,
+    "n_train": 200000.0
   }
 }
