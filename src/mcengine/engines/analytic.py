@@ -11,6 +11,21 @@ Black-Scholes (1973) with continuous dividend yield :math:`q`:
 A cash-or-nothing digital call pays :math:`e^{-rT}N(d_2)` per unit payout
 (Reiner & Rubinstein, 1991b).
 
+Discrete geometric Asian (Kemna & Vorst, 1990, discrete-monitoring version): with
+fixing dates :math:`t_1<\dots<t_m`, :math:`\ln G` is normal with
+
+.. math::
+
+    \mu_G = \ln S_0 + (r - q - \tfrac12\sigma^2)\,\bar t,\qquad
+    \sigma_G^2 = \frac{\sigma^2}{m^2}\sum_{i,j}\min(t_i, t_j),
+
+so the call is :math:`e^{-rT}\big(e^{\mu_G + \sigma_G^2/2}N(d_1) - KN(d_2)\big)` with
+:math:`d_1 = (\mu_G - \ln K + \sigma_G^2)/\sigma_G`, :math:`d_2 = d_1 - \sigma_G`.
+
+Continuously monitored single barriers (Reiner & Rubinstein, 1991a), in the notation
+of Haug (2007, Section 4.17.1) with zero rebate: the eight contracts are combinations of
+the terms :math:`A, B, C, D` implemented in :func:`barrier_price`.
+
 All functions are vectorised: array inputs broadcast, scalar inputs return ``float``.
 """
 
@@ -26,6 +41,8 @@ from mcengine._typing import FloatArray
 from mcengine._validation import require_choice
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.products.asian import AsianOption
+from mcengine.products.barrier import BARRIER_TYPES, BGK_BETA, BarrierOption
 from mcengine.products.base import OPTION_TYPES, Product
 from mcengine.products.european import DigitalOption, EuropeanOption
 from mcengine.results import PricingResult
@@ -109,6 +126,126 @@ def bs_digital_price(
     return as_output(payout * disc * prob)
 
 
+def geometric_asian_price(
+    s0: float,
+    strike: float,
+    fixing_times: ArrayLike,
+    r: float,
+    sigma: float,
+    q: float = 0.0,
+    option_type: str = "call",
+) -> float:
+    """Discrete geometric-average Asian option (Kemna & Vorst, 1990).
+
+    ``fixing_times`` are the averaging dates; the payment date is the last of them.
+    """
+    require_choice("option_type", option_type, OPTION_TYPES)
+    t = np.asarray(fixing_times, dtype=np.float64)
+    if t.ndim != 1 or t.size == 0 or np.any(t <= 0.0) or np.any(np.diff(t) <= 0.0):
+        raise ValueError("fixing_times must be positive and strictly increasing")
+    _check_inputs(np.asarray([s0, strike, sigma]), names=("s0, strike and sigma",))
+    maturity = float(t[-1])
+    mu = np.log(s0) + (r - q - 0.5 * sigma**2) * float(t.mean())
+    var = sigma**2 * float(np.minimum.outer(t, t).mean())
+    vol = np.sqrt(var)
+    d1 = (mu - np.log(strike) + var) / vol
+    d2 = d1 - vol
+    fwd = np.exp(mu + 0.5 * var)
+    disc = np.exp(-r * maturity)
+    if option_type == "call":
+        return float(disc * (fwd * ndtr(d1) - strike * ndtr(d2)))
+    return float(disc * (strike * ndtr(-d2) - fwd * ndtr(-d1)))
+
+
+def barrier_price(
+    s0: float,
+    strike: float,
+    barrier: float,
+    maturity: float,
+    r: float,
+    sigma: float,
+    q: float = 0.0,
+    barrier_type: str = "down-and-out",
+    option_type: str = "call",
+) -> float:
+    """Continuously monitored single-barrier option, zero rebate (Reiner & Rubinstein, 1991).
+
+    Raises
+    ------
+    ValueError
+        For invalid inputs or a spot already on the knocked side of the barrier.
+    """
+    require_choice("barrier_type", barrier_type, BARRIER_TYPES)
+    require_choice("option_type", option_type, OPTION_TYPES)
+    _check_inputs(
+        np.asarray([s0, strike, barrier, maturity, sigma]),
+        names=("s0, strike, barrier, maturity and sigma",),
+    )
+    down = barrier_type.startswith("down")
+    if (down and s0 <= barrier) or (not down and s0 >= barrier):
+        raise ValueError(f"spot {s0:g} is not on the live side of the {barrier_type} barrier")
+    phi = 1.0 if option_type == "call" else -1.0
+    eta = 1.0 if down else -1.0
+    b = r - q
+    vol_t = sigma * np.sqrt(maturity)
+    mu = (b - 0.5 * sigma**2) / sigma**2
+    shift = (1.0 + mu) * vol_t
+    x1 = np.log(s0 / strike) / vol_t + shift
+    x2 = np.log(s0 / barrier) / vol_t + shift
+    y1 = np.log(barrier**2 / (s0 * strike)) / vol_t + shift
+    y2 = np.log(barrier / s0) / vol_t + shift
+    carry = s0 * np.exp((b - r) * maturity)
+    disc_k = strike * np.exp(-r * maturity)
+    up_pow = (barrier / s0) ** (2.0 * (mu + 1.0))
+    k_pow = (barrier / s0) ** (2.0 * mu)
+
+    def vanilla_term(x: float) -> float:
+        return float(phi * carry * ndtr(phi * x) - phi * disc_k * ndtr(phi * x - phi * vol_t))
+
+    def reflected_term(y: float) -> float:
+        return float(
+            phi * carry * up_pow * ndtr(eta * y)
+            - phi * disc_k * k_pow * ndtr(eta * y - eta * vol_t)
+        )
+
+    a_t, b_t = vanilla_term(x1), vanilla_term(x2)
+    c_t, d_t = reflected_term(y1), reflected_term(y2)
+    above = strike >= barrier
+    table = {
+        ("down-and-in", "call"): c_t if above else a_t - b_t + d_t,
+        ("up-and-in", "call"): a_t if above else b_t - c_t + d_t,
+        ("down-and-in", "put"): b_t - c_t + d_t if above else a_t,
+        ("up-and-in", "put"): a_t - b_t + d_t if above else c_t,
+        ("down-and-out", "call"): a_t - c_t if above else b_t - d_t,
+        ("up-and-out", "call"): 0.0 if above else a_t - b_t + c_t - d_t,
+        ("down-and-out", "put"): a_t - b_t + c_t - d_t if above else 0.0,
+        ("up-and-out", "put"): b_t - d_t if above else a_t - c_t,
+    }
+    return max(table[(barrier_type, option_type)], 0.0)
+
+
+def barrier_price_discrete_bgk(
+    s0: float,
+    strike: float,
+    barrier: float,
+    maturity: float,
+    r: float,
+    sigma: float,
+    n_monitoring: int,
+    q: float = 0.0,
+    barrier_type: str = "down-and-out",
+    option_type: str = "call",
+) -> float:
+    """Broadie-Glasserman-Kou (1997) approximation of a *discretely* monitored barrier.
+
+    The continuous formula is evaluated with the barrier shifted away from the spot by
+    ``exp(beta sigma sqrt(T / m))``.
+    """
+    shift = BGK_BETA * sigma * np.sqrt(maturity / n_monitoring)
+    shifted = float(barrier * np.exp(-shift if barrier_type.startswith("down") else shift))
+    return barrier_price(s0, strike, shifted, maturity, r, sigma, q, barrier_type, option_type)
+
+
 def deterministic_result(price: float, method: str, started: float) -> PricingResult:
     """Wrap a deterministic price into a :class:`PricingResult`."""
     return PricingResult(
@@ -142,6 +279,24 @@ def price_analytic(model: Model, product: Product) -> PricingResult:
             k, t, kind = product.strike, product.maturity, product.option_type
             price = bs_digital_price(m.s0, k, t, m.r, m.sigma, m.q, kind, product.payout)
             return deterministic_result(float(price), "bs-analytic", started)
+        if isinstance(product, AsianOption) and product.average == "geometric":
+            times = product.monitoring_times()
+            kind = product.option_type
+            price = geometric_asian_price(m.s0, product.strike, times, m.r, m.sigma, m.q, kind)
+            return deterministic_result(price, "kemna-vorst", started)
+        if isinstance(product, BarrierOption):
+            price = barrier_price(
+                m.s0,
+                product.strike,
+                product.barrier,
+                product.maturity,
+                m.r,
+                m.sigma,
+                m.q,
+                product.barrier_type,
+                product.option_type,
+            )
+            return deterministic_result(price, "reiner-rubinstein", started)
     raise ValueError(
         f"no closed form for model {type(model).__name__} and product {type(product).__name__}"
     )
