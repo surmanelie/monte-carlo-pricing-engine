@@ -32,13 +32,17 @@ from mcengine.engines.analytic import (
     bs_digital_price,
     bs_price,
     geometric_asian_price,
+    merton_price,
 )
 from mcengine.engines.convolution import asian_arithmetic_price
+from mcengine.engines.fourier import gil_pelaez_price
 from mcengine.engines.lsm import price_lsm
 from mcengine.engines.monte_carlo import price_mc
 from mcengine.engines.tree import price_tree
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.models.heston import Heston
+from mcengine.models.merton import Merton
 from mcengine.products.american import AmericanOption
 from mcengine.products.asian import AsianOption
 from mcengine.products.barrier import BARRIER_TYPES, BarrierOption
@@ -402,9 +406,75 @@ def _american_cases() -> list[ValidationCase]:
     return cases
 
 
+#: Heston parameters used throughout the validation (Feller ratio 0.64).
+HESTON = Heston(s0=100.0, r=0.03, v0=0.04, kappa=2.0, theta=0.04, xi=0.5, rho=-0.7)
+#: Merton parameters used throughout the validation.
+MERTON = Merton(s0=100.0, r=0.05, sigma=0.2, lam=1.0, mu_j=-0.1, delta_j=0.15)
+
+
+def _heston_cases() -> list[ValidationCase]:
+    cases: list[ValidationCase] = []
+    specs = [
+        ("qe", "call", 90.0, "plain", 50),
+        ("qe", "call", 100.0, "plain", 50),
+        ("qe", "call", 110.0, "plain", 50),
+        ("qe", "call", 100.0, "antithetic", 50),
+        ("qe", "put", 100.0, "cv", 50),
+        ("euler", "call", 100.0, "plain", 200),
+    ]
+    for scheme, kind, strike, method, n_steps in specs:
+        model = HESTON.with_scheme(scheme)
+        product = EuropeanOption(strike, 1.0, kind)
+
+        def reference(k: float = strike, o: str = kind) -> float:
+            return gil_pelaez_price(HESTON, k, 1.0, o)
+
+        label = f"Heston {'QE' if scheme == 'qe' else 'Euler FT'} (Δt = 1/{n_steps})"
+        cid = f"heston-{scheme}-{kind}-{strike:g}-{method}"
+        cases.append(
+            mc_case(
+                cid,
+                label,
+                model,
+                product,
+                method,
+                _N_EURO,
+                reference,
+                "Gil-Pelaez (little trap)",
+                n_steps=n_steps,
+            )
+        )
+    return cases
+
+
+def _merton_cases() -> list[ValidationCase]:
+    m = MERTON
+    cases: list[ValidationCase] = []
+    specs = [
+        ("call", 80.0, "plain"),
+        ("call", 100.0, "plain"),
+        ("call", 120.0, "plain"),
+        ("call", 100.0, "cv"),
+        ("put", 100.0, "antithetic"),
+    ]
+    for kind, strike, method in specs:
+        product = EuropeanOption(strike, 1.0, kind)
+        ref = merton_price(m.s0, strike, 1.0, m.r, m.sigma, m.lam, m.mu_j, m.delta_j, m.q, kind)
+        cid = f"merton-{kind}-{strike:g}-{method}"
+        cases.append(mc_case(cid, "Merton", m, product, method, _N_EURO, ref, "Merton series"))
+    return cases
+
+
 def all_cases() -> list[ValidationCase]:
     """The full validation registry, in table order."""
-    return [*_european_cases(), *_asian_cases(), *_barrier_cases(), *_american_cases()]
+    return [
+        *_european_cases(),
+        *_asian_cases(),
+        *_barrier_cases(),
+        *_american_cases(),
+        *_heston_cases(),
+        *_merton_cases(),
+    ]
 
 
 #: Case identifiers used in the confidence-interval coverage study.
@@ -416,6 +486,7 @@ COVERAGE_CASE_IDS: tuple[str, ...] = (
     "gbm-digital-call-plain",
     "gbm-asian-arith-call-12-cv",
     "gbm-barrier-down-and-out-call-bridge",
+    "merton-call-100-plain",
 )
 
 

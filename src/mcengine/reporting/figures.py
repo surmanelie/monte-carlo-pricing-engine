@@ -11,14 +11,18 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
 from mcengine.engines.analytic import barrier_price, bs_price
+from mcengine.engines.fourier import fourier_prices, gil_pelaez_price
 from mcengine.engines.lsm import fit_lsm
 from mcengine.engines.monte_carlo import price_mc, simulate_discounted_payoffs
 from mcengine.engines.tree import crr_exercise_boundary
+from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.models.heston import Heston
 from mcengine.products.american import AmericanOption
 from mcengine.products.barrier import BarrierOption
 from mcengine.products.european import EuropeanOption
@@ -30,7 +34,9 @@ from mcengine.reporting.style import (
     new_figure,
     save_figure,
 )
+from mcengine.reporting.validation import HESTON, MERTON
 from mcengine.stats import z_value
+from mcengine.volatility.implied import implied_vol
 
 FigureFunc = Callable[[Path, bool], dict[str, float]]
 
@@ -220,11 +226,128 @@ def fig_exercise_boundary(outdir: Path, quick: bool = False) -> dict[str, float]
     return out
 
 
+def _smile_panel(
+    ax: Any, model: Model, title: str, mc_steps: int | None, n_paths: int, seed: int
+) -> dict[str, float]:
+    """Fourier implied-vol curves per maturity plus MC points (95 % CI) at T = 1."""
+    moneyness = np.linspace(0.7, 1.3, 41)
+    strikes = model.s0 * moneyness
+    out: dict[str, float] = {}
+    maturities = (0.25, 0.5, 1.0, 2.0)
+    for i, maturity in enumerate(maturities):
+        prices = fourier_prices(model, strikes, maturity)
+        vols = np.asarray(implied_vol(prices, model.s0, strikes, maturity, model.r, model.q))
+        ax.plot(moneyness, vols, color=PALETTE[i], label=f"$T = {maturity:g}$ (Fourier)")
+        out[f"atm_vol_T{maturity:g}"] = float(np.interp(1.0, moneyness, vols))
+        out[f"skew_T{maturity:g}"] = float(vols[0] - vols[-1])
+    mc_moneyness = np.array([0.8, 0.9, 1.0, 1.1, 1.2])
+    mc_vol, mc_lo, mc_hi = [], [], []
+    for j, m in enumerate(mc_moneyness):
+        product = EuropeanOption(model.s0 * m, 1.0, "put" if m < 1.0 else "call")
+        res = price_mc(model, product, n_paths=n_paths, n_steps=mc_steps, seed=seed + j)
+        assert res.ci_low is not None
+        assert res.ci_high is not None
+        iv = implied_vol(
+            [res.price, res.ci_low, res.ci_high],
+            model.s0,
+            product.strike,
+            1.0,
+            model.r,
+            model.q,
+            product.option_type,
+        )
+        v = np.asarray(iv)
+        mc_vol.append(v[0])
+        mc_lo.append(v[0] - v[1])
+        mc_hi.append(v[2] - v[0])
+    ax.errorbar(
+        mc_moneyness,
+        mc_vol,
+        yerr=[mc_lo, mc_hi],
+        fmt="o",
+        color=INK,
+        markersize=5,
+        capsize=3,
+        label=f"Monte Carlo, $T = 1$ (95 % CI, {n_paths:,} paths)",
+    )
+    ax.set_xlabel("Moneyness $K / S_0$")
+    ax.set_ylabel("Black-Scholes implied volatility")
+    ax.set_title(title)
+    ax.legend(fontsize=8)
+    return out
+
+
+def fig_smiles(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """Implied-volatility smiles/skews of the Heston and Merton models."""
+    n_paths = 20_000 if quick else 200_000
+    fig, axes = new_figure(1, 2, width=11.0, height=4.4)
+    out = {}
+    heston = _smile_panel(axes[0], HESTON, "Heston (QE, $\\Delta t = 1/50$)", 50, n_paths, 900)
+    merton = _smile_panel(axes[1], MERTON, "Merton jump-diffusion", None, n_paths, 950)
+    out.update({f"heston_{k}": v for k, v in heston.items()})
+    out.update({f"merton_{k}": v for k, v in merton.items()})
+    save_figure(fig, outdir / "smiles.png")
+    return out
+
+
+def fig_heston_scheme_bias(outdir: Path, quick: bool = False) -> dict[str, float]:
+    """QE vs full-truncation Euler bias vs time step in a Feller-violating stress case."""
+    model = Heston(100.0, 0.0, 0.04, 0.5, 0.04, 1.0, -0.9)
+    maturity = 10.0
+    product = EuropeanOption(100.0, maturity)
+    ref = gil_pelaez_price(model, 100.0, maturity)
+    n_paths = 10_000 if quick else 400_000
+    steps_per_year = [1, 4] if quick else [1, 2, 4, 8, 16, 32]
+    dts = 1.0 / np.array(steps_per_year, dtype=float)
+    fig, ax = new_figure()
+    out: dict[str, float] = {"reference": ref, "feller_ratio": model.feller_ratio}
+    for offset, (scheme, label) in enumerate(
+        (("qe", "Andersen QE"), ("euler", "Full-truncation Euler"))
+    ):
+        errors, half = [], []
+        for i, spy in enumerate(steps_per_year):
+            res = price_mc(
+                model.with_scheme(scheme),
+                product,
+                n_paths=n_paths,
+                n_steps=int(spy * maturity),
+                seed=7000 + 100 * offset + i,
+            )
+            assert res.std_error is not None
+            errors.append(res.price - ref)
+            half.append(z_value(0.95) * res.std_error)
+            out[f"{scheme}_bias_dt{1 / spy:g}"] = res.price - ref
+            out[f"{scheme}_se_dt{1 / spy:g}"] = res.std_error
+        ax.errorbar(
+            dts,
+            errors,
+            yerr=half,
+            color=PALETTE[offset],
+            marker="os"[offset],
+            capsize=3,
+            markersize=6,
+            label=label,
+        )
+    ax.axhline(0.0, color=INK, linestyle="--", linewidth=1.2, label="Fourier reference")
+    ax.set_xscale("log", base=2)
+    ax.invert_xaxis()
+    ax.set_xlabel("Time step $\\Delta t$ (years, log scale)")
+    ax.set_ylabel("Price error vs Fourier (95 % CI)")
+    ax.set_title(
+        f"Heston ATM call, $T = 10$, Feller ratio {model.feller_ratio:.2f}: discretisation bias"
+    )
+    ax.legend()
+    save_figure(fig, outdir / "heston_scheme_bias.png")
+    return out
+
+
 FIGURES: dict[str, FigureFunc] = {
     "convergence": fig_convergence,
     "error_vs_n": fig_error_vs_n,
     "barrier_monitoring": fig_barrier_monitoring,
     "exercise_boundary": fig_exercise_boundary,
+    "smiles": fig_smiles,
+    "heston_scheme_bias": fig_heston_scheme_bias,
 }
 
 
