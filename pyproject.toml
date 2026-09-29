@@ -1,0 +1,107 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "monte-carlo-pricing-engine"
+dynamic = ["version"]
+description = "Monte Carlo derivatives pricing & hedging engine: GBM, Heston, Merton; exotic and American options; variance reduction, QMC, Greeks, delta hedging, calibration; every result validated against an independent reference."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Elie Surman" }]
+requires-python = ">=3.11"
+keywords = ["monte-carlo", "option-pricing", "quantitative-finance", "heston", "longstaff-schwartz"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "typer>=0.12",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+fast = ["numba>=0.59"]
+app = ["streamlit>=1.35", "plotly>=5.20"]
+docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.25"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-benchmark>=4.0",
+    "hypothesis>=6.100",
+    "mypy>=1.10",
+    "ruff>=0.6",
+    "pre-commit>=3.7",
+    "nbconvert>=7.16",
+    "ipykernel>=6.29",
+]
+
+[project.scripts]
+mcengine = "mcengine.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/surmanelie/monte-carlo-pricing-engine"
+Documentation = "https://surmanelie.github.io/monte-carlo-pricing-engine/"
+Issues = "https://github.com/surmanelie/monte-carlo-pricing-engine/issues"
+
+[tool.hatch.version]
+path = "src/mcengine/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcengine"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts", "app"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "NPY", "RUF", "C4", "PT", "PIE", "RET"]
+ignore = ["RUF002", "RUF003", "RUF001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["mcengine"]
+
+[tool.mypy]
+strict = true
+warn_unreachable = true
+files = ["src"]
+plugins = []
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "numba.*", "plotly.*", "streamlit.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra --strict-markers --import-mode=importlib -m 'not slow'"
+markers = ["slow: long-running statistical tests (nightly CI only)"]
+filterwarnings = ["error::RuntimeWarning:mcengine.*"]
+
+[tool.coverage.run]
+source = ["mcengine"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+    "\\.\\.\\.",
+]
