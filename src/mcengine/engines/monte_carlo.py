@@ -19,9 +19,24 @@ Estimators (Glasserman 2003, Ch. 4):
     variance :math:`\widehat{\mathrm{Var}}(Y - \hat\beta X)/n`. The default control for
     vanilla payoffs is the discounted terminal price :math:`e^{-rT}S_T` with known mean
     :math:`S_0 e^{-qT}`.
+``is`` (importance sampling)
+    the normals driving the price are drawn from :math:`N(c_k, 1)` instead of
+    :math:`N(0, 1)`, with the constant-drift (Girsanov) shift
+    :math:`c_k = \mu\sqrt{\Delta t_k/T}` that moves the terminal Brownian value by
+    :math:`\mu\sqrt T`; each payoff is weighted by the likelihood ratio
+    :math:`\exp(\sum_k -c_kZ_k + \tfrac12c_k^2)`. The default
+    :math:`\mu = (\ln(K/S_0) - (r - q - \tfrac12\sigma^2)T)/(\sigma\sqrt T)` centres the
+    terminal price at the strike, which is effective for out-of-the-money payoffs
+    (Glasserman 2003, Section 4.6.1).
+``qmc`` (randomised quasi-Monte Carlo)
+    ``n_scrambles`` independently scrambled Sobol sequences of ``n_paths / n_scrambles``
+    points (a power of two), with Brownian-bridge path construction
+    (:mod:`mcengine.random.qmc`); the standard error is the standard deviation of the
+    scramble estimates divided by :math:`\sqrt{R}`.
 
-Reproducibility: all normals come from one generator stream consumed sequentially, so
-the estimate does not depend on the chunk size (up to floating-point summation order).
+Reproducibility: all normals come from one generator stream consumed sequentially (and
+Sobol points are drawn sequentially), so the estimate does not depend on the chunk size
+(up to floating-point summation order).
 """
 
 from __future__ import annotations
@@ -39,19 +54,26 @@ from mcengine._validation import require_choice, require_int_at_least
 from mcengine.engines.analytic import geometric_asian_price
 from mcengine.models.base import Model
 from mcengine.models.gbm import GBM
+from mcengine.models.heston import Heston
+from mcengine.models.merton import Merton
 from mcengine.products.american import AmericanOption
 from mcengine.products.asian import AsianOption
+from mcengine.products.barrier import BarrierOption
 from mcengine.products.base import Product, time_indices
-from mcengine.random.generators import make_rng
+from mcengine.products.european import DigitalOption, EuropeanOption
+from mcengine.random.generators import make_rng, spawn
+from mcengine.random.qmc import SobolNormals, is_power_of_two
 from mcengine.results import PricingResult
 from mcengine.stats import StreamingMoments, z_value
 
-Method = Literal["plain", "antithetic", "cv"]
-METHODS: tuple[str, ...] = ("plain", "antithetic", "cv")
+Method = Literal["plain", "antithetic", "cv", "is", "qmc"]
+METHODS: tuple[str, ...] = ("plain", "antithetic", "cv", "is", "qmc")
 METHOD_LABELS: dict[str, str] = {
     "plain": "mc-plain",
     "antithetic": "mc-antithetic",
     "cv": "mc-cv",
+    "is": "mc-is",
+    "qmc": "qmc-sobol-bb",
 }
 
 #: Approximate number of float64 values held in memory per chunk (~64 MB of paths).
@@ -107,6 +129,27 @@ def default_control(model: Model, product: Product) -> ControlVariate:
     if isinstance(model, GBM) and isinstance(product, AsianOption):
         return geometric_asian_control(model, product)
     return underlying_control(model, product.maturity)
+
+
+def reference_vol(model: Model) -> float:
+    """A representative volatility of the log-price (used by the default IS shift)."""
+    if isinstance(model, GBM):
+        return model.sigma
+    if isinstance(model, Merton):
+        return math.sqrt(model.sigma**2 + model.lam * (model.mu_j**2 + model.delta_j**2))
+    if isinstance(model, Heston):
+        return math.sqrt(max(model.v0, model.theta))
+    raise ValueError(f"no reference volatility for {type(model).__name__}; pass is_shift")
+
+
+def default_is_shift(model: Model, product: Product) -> float:
+    """Shift that centres the terminal price at the strike (median of ``S_T`` at ``K``)."""
+    if not isinstance(product, EuropeanOption | DigitalOption | AsianOption | BarrierOption):
+        raise ValueError(f"no default importance-sampling shift for {type(product).__name__}")
+    sigma = reference_vol(model)
+    t = product.maturity
+    drift = (model.r - model.q - 0.5 * sigma**2) * t
+    return (math.log(product.strike / model.s0) - drift) / (sigma * math.sqrt(t))
 
 
 def build_time_grid(model: Model, product: Product, n_steps: int | None = None) -> FloatArray:
@@ -176,6 +219,9 @@ def price_mc(
     rng: np.random.Generator | None = None,
     chunk_size: int | None = None,
     control: ControlVariate | None = None,
+    is_shift: float | None = None,
+    n_scrambles: int = 16,
+    bridge: bool = True,
 ) -> PricingResult:
     """Price ``product`` under ``model`` by Monte Carlo simulation.
 
@@ -184,9 +230,10 @@ def price_mc(
     model, product
         Asset model and payoff.
     n_paths
-        Total number of simulated paths (``>= 2``; even for ``antithetic``).
+        Total number of simulated paths (``>= 2``; even for ``antithetic``; for ``qmc``
+        ``n_scrambles`` times a power of two).
     method
-        ``"plain"``, ``"antithetic"`` or ``"cv"``.
+        ``"plain"``, ``"antithetic"``, ``"cv"``, ``"is"`` or ``"qmc"``.
     n_steps
         Number of uniform time steps; ``None`` simulates on the monitoring dates only.
     seed, rng
@@ -195,12 +242,18 @@ def price_mc(
         Paths per chunk; ``None`` picks a size that keeps memory around 64 MB.
     control
         Control variate for ``method="cv"`` (default: :func:`default_control`).
+    is_shift
+        Terminal drift shift ``mu`` for ``method="is"`` (default: :func:`default_is_shift`).
+    n_scrambles, bridge
+        Number of independent Sobol scramblings and Brownian-bridge construction for
+        ``method="qmc"``.
 
     Returns
     -------
     PricingResult
         Price, standard error and 95 % confidence interval. ``diagnostics`` holds
-        ``beta`` and ``vr_factor`` (variance ratio plain / controlled) for ``cv``.
+        ``beta`` and ``vr_factor`` (variance ratio plain / controlled) for ``cv``, the
+        shift and ``vr_factor`` for ``is``, and ``n_scrambles`` for ``qmc``.
     """
     started = time.perf_counter()
     require_choice("method", method, METHODS)
@@ -222,6 +275,7 @@ def price_mc(
         paths = model.paths_from_normals(times, z)
         return disc * product.payoff(paths, times), paths
 
+    label = METHOD_LABELS[method]
     diagnostics: dict[str, float] = {}
     if method == "cv":
         cv = default_control(model, product) if control is None else control
@@ -229,18 +283,28 @@ def price_mc(
         for size in chunk_sizes(n_paths, chunk):
             y, paths = discounted(gen.standard_normal((size, n_t, n_f)))
             acc.update(np.column_stack((y, cv.func(paths, times))))
-        cov, mean = acc.covariance, acc.mean
-        beta = float(cov[0, 1] / cov[1, 1]) if cov[1, 1] > 0.0 else 0.0
-        price = float(mean[0] - beta * (mean[1] - cv.mean))
-        var = max(float(cov[0, 0] - 2.0 * beta * cov[0, 1] + beta**2 * cov[1, 1]), 0.0)
-        std_error = math.sqrt(var / acc.count)
-        diagnostics = {
-            "beta": beta,
-            "vr_factor": float(cov[0, 0] / var) if var > 0.0 else math.inf,
-            "corr": float(cov[0, 1] / math.sqrt(cov[0, 0] * cov[1, 1]))
-            if cov[0, 0] > 0.0 and cov[1, 1] > 0.0
-            else 0.0,
-        }
+        price, std_error, diagnostics = _control_variate_estimate(acc, cv.mean)
+    elif method == "is":
+        mu = default_is_shift(model, product) if is_shift is None else float(is_shift)
+        shift = mu * np.sqrt(np.diff(times) / product.maturity)
+        factor = model.price_factor
+        acc = StreamingMoments(dim=2)
+        for size in chunk_sizes(n_paths, chunk):
+            z = gen.standard_normal((size, n_t, n_f))
+            z[:, :, factor] += shift
+            weight = np.exp(-(z[:, :, factor] @ shift) + 0.5 * float(shift @ shift))
+            y = discounted(z)[0]
+            acc.update(np.column_stack((y * weight, y * y * weight)))
+        price, std_error = float(acc.mean[0]), acc.std_error()
+        plain_var = float(acc.mean[1]) - price**2
+        var = float(acc.variance[0])
+        diagnostics = {"is_shift": mu, "vr_factor": plain_var / var if var > 0.0 else math.inf}
+    elif method == "qmc":
+        price, std_error = _qmc_estimate(
+            discounted, times, n_f, n_paths, n_scrambles, chunk, bridge, gen
+        )
+        label = "qmc-sobol-bb" if bridge else "qmc-sobol"
+        diagnostics = {"n_scrambles": float(n_scrambles)}
     else:
         acc = StreamingMoments(dim=1)
         for size in chunk_sizes(n_paths, chunk):
@@ -253,7 +317,60 @@ def price_mc(
                 acc.update(discounted(gen.standard_normal((size, n_t, n_f)))[0])
         price = float(acc.mean[0])
         std_error = acc.std_error()
-    return _result(price, std_error, n_paths, n_t, METHOD_LABELS[method], started, diagnostics)
+    return _result(price, std_error, n_paths, n_t, label, started, diagnostics)
+
+
+def _control_variate_estimate(
+    acc: StreamingMoments, control_mean: float
+) -> tuple[float, float, dict[str, float]]:
+    cov, mean = acc.covariance, acc.mean
+    beta = float(cov[0, 1] / cov[1, 1]) if cov[1, 1] > 0.0 else 0.0
+    price = float(mean[0] - beta * (mean[1] - control_mean))
+    var = max(float(cov[0, 0] - 2.0 * beta * cov[0, 1] + beta**2 * cov[1, 1]), 0.0)
+    corr = (
+        float(cov[0, 1] / math.sqrt(cov[0, 0] * cov[1, 1]))
+        if cov[0, 0] > 0.0 and cov[1, 1] > 0.0
+        else 0.0
+    )
+    diagnostics = {
+        "beta": beta,
+        "vr_factor": float(cov[0, 0] / var) if var > 0.0 else math.inf,
+        "corr": corr,
+    }
+    return price, math.sqrt(var / acc.count), diagnostics
+
+
+def _qmc_estimate(
+    discounted: Callable[[FloatArray], tuple[FloatArray, FloatArray]],
+    times: FloatArray,
+    n_factors: int,
+    n_paths: int,
+    n_scrambles: int,
+    chunk: int,
+    bridge: bool,
+    gen: np.random.Generator,
+) -> tuple[float, float]:
+    require_int_at_least("n_scrambles", n_scrambles, 2)
+    per = n_paths // n_scrambles
+    if per * n_scrambles != n_paths or not is_power_of_two(per):
+        raise ValueError(
+            f"qmc needs n_paths = n_scrambles x 2^m, got {n_paths} with {n_scrambles} scrambles"
+        )
+    chunk_q = min(per, 1 << (chunk.bit_length() - 1))  # largest power of two <= chunk
+    estimates = np.empty(n_scrambles)
+    for r, child in enumerate(spawn(gen, n_scrambles)):
+        sampler = SobolNormals(times, n_factors, child, bridge)
+        acc = StreamingMoments()
+        for size in chunk_sizes(per, chunk_q):
+            acc.update(discounted(sampler.draw(size))[0])
+        estimates[r] = acc.mean[0]
+    return float(estimates.mean()), float(estimates.std(ddof=1) / math.sqrt(n_scrambles))
+
+
+def qmc_path_count(n_paths: int, n_scrambles: int = 16) -> int:
+    """Largest valid QMC path count ``n_scrambles * 2^m`` not above ``n_paths``."""
+    per = max(1, n_paths // n_scrambles)
+    return n_scrambles * (1 << (per.bit_length() - 1))
 
 
 def _result(
