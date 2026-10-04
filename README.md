@@ -370,6 +370,4 @@ timings depend on the machine.
 
 The [documentation](https://surmanelie.github.io/monte-carlo-pricing-engine/references/) lists every reference used.
 
-## License
 
-MIT © Elie Surman. See [LICENSE](LICENSE).
